@@ -1,5 +1,6 @@
 {
     "name": "pm-manifest-icons-test",
+    "description": "Application for testing pm-manifest-icons package with React + TypeScript + Vite. 2025 edition.",
     "private": true,
     "version": "0.0.0",
     "type": "module",
