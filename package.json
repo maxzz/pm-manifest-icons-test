@@ -4,6 +4,11 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "esbuild"
+        ]
+    },
     "devDependencies": {
         "@types/react": "^19.1.2",
         "@types/react-dom": "^19.1.2",
@@ -13,6 +18,7 @@
         "vite": "^6.3.5"
     },
     "dependencies": {
+        "pm-manifest-icons": "^1.0.4",
         "react": "^19.1.0",
         "react-dom": "^19.1.0"
     },
