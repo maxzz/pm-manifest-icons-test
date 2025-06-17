@@ -6,6 +6,7 @@
     "type": "module",
     "pnpm": {
         "onlyBuiltDependencies": [
+            "@tailwindcss/oxide",
             "esbuild"
         ]
     },
@@ -18,9 +19,11 @@
         "vite": "^6.3.5"
     },
     "dependencies": {
+        "@tailwindcss/vite": "^4.1.10",
         "pm-manifest-icons": "^1.0.4",
         "react": "^19.1.0",
-        "react-dom": "^19.1.0"
+        "react-dom": "^19.1.0",
+        "tailwindcss": "^4.1.10"
     },
     "scripts": {
         "dev": "vite",
