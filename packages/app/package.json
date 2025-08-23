@@ -21,7 +21,7 @@
         "tailwindcss": "^4.1.10"
     },
     "scripts": {
-        "tsc": "tsc -w",
+        "tsc": "tsc -p tsconfig.app.json -w",
         "web": "vite",
         "dev": "vite",
         "build": "tsc -b && vite build",
