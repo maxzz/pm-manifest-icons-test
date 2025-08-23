@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export function Footer() {
+export function SectionFooter() {
     return (
         <footer className="flex items-center justify-between w-full h-16 bg-background-light">
             <div className="flex items-center gap-2 px-4">
