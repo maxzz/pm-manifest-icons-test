@@ -8,25 +8,5 @@
             "url": "http://localhost:3000",
             "webRoot": "${workspaceFolder}"
         },
-        {
-            "name": "Launch Vite App in Browser",
-            "request": "launch",
-            "type": "${input:browserType}",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}/packages/app",
-            "preLaunchTask": "start-vite",
-            "userDataDir": "${workspaceFolder}/.vscode/vscode-browser-profile"
-        }
     ],
-    "inputs": [
-        {
-            "id": "browserType",
-            "type": "pickString",
-            "description": "Select the browser debug adapter to use for debugging the web app",
-            "options": [
-                "pwa-chrome",
-                "pwa-msedge"
-            ]
-        }
-    ]
 }
