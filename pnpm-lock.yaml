@@ -14,8 +14,8 @@ importers:
         specifier: ^4.1.10
         version: 4.1.12(vite@6.3.5(jiti@2.5.1)(lightningcss@1.30.1))
       pm-manifest-icons:
-        specifier: ^1.0.4
-        version: 1.0.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: ^1.0.6
+        version: 1.0.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react:
         specifier: ^19.1.0
         version: 19.1.1
@@ -725,8 +725,8 @@ packages:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
 
-  pm-manifest-icons@1.0.4:
-    resolution: {integrity: sha512-IvvAZlxM7vElOm5r2wUOIUJl4bTstAE7nUb9Ewy5DApnUT00eGfgw2G6GXi5J3kD1gOaiGPdAwRVIvodPB0vpA==}
+  pm-manifest-icons@1.0.6:
+    resolution: {integrity: sha512-kRjpuvvM13GruEFd7B9DCUt8GDc/9S8XChBfPU4EscOOSkc1txok7yNOpYfiuOdmE9zjDlVEbj1aqnXncmadsg==}
     peerDependencies:
       react: ^18.2.0 || ^19
       react-dom: ^18.2.0 || ^19
@@ -1387,7 +1387,7 @@ snapshots:
 
   picomatch@4.0.3: {}
 
-  pm-manifest-icons@1.0.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+  pm-manifest-icons@1.0.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
