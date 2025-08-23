@@ -1,4 +1,4 @@
-import { UISymbolDefs } from "./components/ui/icons/symbols";
+import { UISymbolDefs } from "../ui/icons/symbols";
 
 export function App() {
     return (
