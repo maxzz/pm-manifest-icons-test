@@ -1,5 +1,5 @@
 {
-    "name": "pm-manifest-icons-test",
+    "name": "pm-manifest-icons-tests",
     "version": "1.0.0",
     "description": "Test SVG symbols",
     "main": "index.js",
@@ -8,6 +8,7 @@
     "license": "ISC",
     "packageManager": "pnpm@10.11.0",
     "scripts": {
-        "tsc": "tsc -w -r"
+        "_notworkingoutput_tsc": "pnpm --filter ./packages/* tsc -w",
+        "web": "pnpm --filter test-app web"
     }
 }
