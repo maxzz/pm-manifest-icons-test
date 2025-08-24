@@ -4,9 +4,27 @@ import path from 'path';
 import fs from 'fs/promises';
 import ts from 'typescript';
 
+function createLogger(verbose: boolean) {
+  function format(level: 'info' | 'debug' | 'warn' | 'error', msg: string, obj?: any) {
+    const out: any = { ts: new Date().toISOString(), level, msg };
+    if (obj) out.data = obj;
+    return JSON.stringify(out);
+  }
+
+  return {
+    info: (msg: string, obj?: any) => console.log(format('info', msg, obj)),
+    debug: (msg: string, obj?: any) => {
+      if (verbose) console.log(format('debug', msg, obj));
+    },
+    warn: (msg: string, obj?: any) => console.warn(format('warn', msg, obj)),
+    error: (msg: string, obj?: any) => console.error(format('error', msg, obj)),
+  };
+}
+
 export interface CollectIconsOptions {
   srcDir?: string; // absolute or relative to process.cwd()
   outFile?: string; // output TypeScript file path (will be created)
+  verbose?: boolean; // print debug info
 }
 
 function extractNames(contents: string, fileName = 'file.ts'): string[] {
@@ -101,7 +119,14 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
   lines.push('export type CollectedIconName = typeof collectedIconNames[number];');
 
   await fs.writeFile(dest, lines.join('\n'), 'utf8');
-  console.warn(`Collected ${uniqueNames.length} icon names to ${dest}`);
+
+  // Structured logging
+  const logger = createLogger(!!opts.verbose);
+  logger.info('collected', { count: uniqueNames.length, dest });
+  if (opts.verbose) {
+    logger.debug('files', { files: entries });
+    logger.debug('names', { names: uniqueNames });
+  }
 
   return { dest, names: uniqueNames };
 }
