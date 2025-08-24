@@ -62,6 +62,31 @@ pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/
 
 This uses the small `bin/collect.js` wrapper which calls the built `dist/index.js`.
 
+Required arguments
+------------------
+The CLI requires the following arguments:
+
+- `--srcDir <path>`: path to the folder containing icon sources to scan.
+- `--prefixes <prefixes>`: one or more name prefixes to detect. Accepts:
+	- JSON array string: `--prefixes "[\"SvgSymbol\",\"Symbol\"]"`
+	- Comma-separated: `--prefixes SvgSymbol,Symbol`
+	- Space-separated (single flag): `--prefixes SvgSymbol Symbol`
+	- Repeated flag: `--prefixes SvgSymbol --prefixes Symbol`
+
+Quick example
+-------------
+
+```
+node packages\\collect-icons\\bin\\collect.js --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli.ts --prefixes SvgSymbol,Symbol --exportFolderName app --mode bare --verbose
+```
+
+When required args are missing the CLI prints a short usage hint, for example:
+
+```
+Missing required argument: --prefixes
+Usage: collect.js --srcDir <path> --prefixes <prefixes> [--outFile <file>] [--exportFolderName <name>] [--mode bare|prefixed|absolute] [--verbose]
+```
+
 CI example (GitHub Actions)
 --------------------------------
 Add the following job/step to your workflow to ensure the `collect-test` runner builds in CI and the collector runs:

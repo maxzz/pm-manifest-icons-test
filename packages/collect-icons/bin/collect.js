@@ -67,6 +67,17 @@ function parseArgs() {
 
 async function main() {
   const opts = parseArgs();
+  const rawArgs = process.argv.slice(2);
+  const hasSrc = rawArgs.some(a => a.toLowerCase().startsWith('--srcdir'));
+  const hasPrefixesFlag = rawArgs.some(a => a.toLowerCase().startsWith('--prefixes'));
+  if (!hasSrc) {
+    console.error('Missing required argument: --srcDir');
+    process.exit(1);
+  }
+  if (!hasPrefixesFlag) {
+    console.error('Missing required argument: --prefixes');
+    process.exit(1);
+  }
   opts.srcDir = path.resolve(process.cwd(), opts.srcDir || 'packages/app/src/components/ui/icons/symbols/all-other');
   opts.outFile = path.resolve(process.cwd(), opts.outFile || 'collected-cli.ts');
   opts.exportFolderName = opts.exportFolderName || 'app';

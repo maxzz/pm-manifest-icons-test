@@ -96,6 +96,19 @@ function parseArgs() {
 
 async function main() {
   const argv = parseArgs();
+  const rawArgs = process.argv.slice(2);
+  const hasSrc = rawArgs.some(a => a.toLowerCase().startsWith('--srcdir'));
+  const hasPrefixesFlag = rawArgs.some(a => a.toLowerCase().startsWith('--prefixes'));
+  if (!hasSrc) {
+    // eslint-disable-next-line no-console
+    console.error('Missing required argument: --srcDir');
+    process.exit(1);
+  }
+  if (!hasPrefixesFlag) {
+    // eslint-disable-next-line no-console
+    console.error('Missing required argument: --prefixes');
+    process.exit(1);
+  }
   const res = await collectIcons({
     srcDir: path.resolve(process.cwd(), argv.srcDir),
     outFile: path.resolve(process.cwd(), argv.outFile),
