@@ -7,6 +7,7 @@ type Mode = 'bare' | 'prefixed' | 'absolute';
 function parseArgs() {
   const args = process.argv.slice(2);
   const map = new Map<string, string>();
+  const prefixesRawValues: string[] = [];
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a.startsWith('--')) {
@@ -17,12 +18,30 @@ function parseArgs() {
         map.set(key, 'false');
         continue;
       }
+      // support --key=value
+      if (key.includes('=')) {
+        const [k, v] = key.split('=');
+        if (k === 'prefixes') prefixesRawValues.push(v);
+        else map.set(k, v);
+        continue;
+      }
       const next = args[i + 1];
       if (!next || next.startsWith('--')) {
         map.set(key, 'true');
       } else {
-        map.set(key, next);
-        i++;
+        if (key === 'prefixes') {
+          const vals: string[] = [];
+          let j = i + 1;
+          while (j < args.length && !args[j].startsWith('--')) {
+            vals.push(args[j]);
+            j++;
+          }
+          prefixesRawValues.push(vals.join(' '));
+          i = j - 1;
+        } else {
+          map.set(key, next);
+          i++;
+        }
       }
     }
   }
@@ -30,16 +49,34 @@ function parseArgs() {
   const srcDir = map.get('srcDir') || 'packages/app/src/components/ui/icons/symbols/all-other';
   const outFile = map.get('outFile') || 'collected-cli.ts';
   const exportFolderName = map.get('exportFolderName') || 'app';
-  const prefixesRaw = map.get('prefixes');
+  if (map.get('prefixes')) prefixesRawValues.push(map.get('prefixes')!);
   let prefixes: string[] | undefined;
-  if (prefixesRaw) {
-    // try JSON parse first, else treat as comma-separated
-    try {
-      const parsed = JSON.parse(prefixesRaw);
-      if (Array.isArray(parsed)) prefixes = parsed.map(String);
-    } catch (e) {
-      prefixes = prefixesRaw.split(',').map(s => s.trim()).filter(Boolean);
+  if (prefixesRawValues.length > 0) {
+    const outArr: string[] = [];
+    function pushParsed(val: string) {
+      const v = String(val).trim();
+      if (!v) return;
+      try {
+        const parsed = JSON.parse(v);
+        if (Array.isArray(parsed)) {
+          for (const p of parsed) if (p) outArr.push(String(p));
+          return;
+        }
+      } catch (e) {
+        // not JSON
+      }
+      if (v.includes(',')) {
+        for (const p of v.split(',').map(s => s.trim()).filter(Boolean)) outArr.push(p);
+        return;
+      }
+      if (v.includes(' ')) {
+        for (const p of v.split(/\s+/).map(s => s.trim()).filter(Boolean)) outArr.push(p);
+        return;
+      }
+      outArr.push(v);
     }
+    for (const r of prefixesRawValues) pushParsed(r);
+    prefixes = Array.from(new Set(outArr));
   }
   const mode = (map.get('mode') || 'bare') as Mode;
   if (!['bare', 'prefixed', 'absolute'].includes(mode)) {
@@ -47,13 +84,13 @@ function parseArgs() {
   }
   const verbose = map.get('verbose') === 'true' || map.get('verbose') === '1';
 
-  return { srcDir, outFile, exportFolderName, mode, verbose } as {
+  return { srcDir, outFile, exportFolderName, mode, verbose, prefixes } as {
     srcDir: string;
     outFile: string;
     exportFolderName: string;
     mode: Mode;
     verbose: boolean;
-  prefixes?: string[] | undefined;
+    prefixes?: string[] | undefined;
   };
 }
 

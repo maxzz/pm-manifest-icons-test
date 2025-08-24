@@ -5,16 +5,62 @@ const { collectIcons } = require('../dist/index');
 function parseArgs() {
   const args = process.argv.slice(2);
   const out = {};
+  const prefixesRawValues = [];
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
-    if (a === '--srcDir') out.srcDir = args[++i];
-  else if (a === '--prefixes') out.prefixes = args[++i];
-    else if (a === '--outFile') out.outFile = args[++i];
-    else if (a === '--exportFolderName') out.exportFolderName = args[++i];
-    else if (a === '--mode') out.bareImportsMode = args[++i];
-    else if (a === '--verbose') out.verbose = true;
-    else if (a === '--recursive') out.recursive = true;
-    else if (a === '--no-recursive') out.recursive = false;
+    if (a.startsWith('--')) {
+      const noEq = a.indexOf('=') === -1;
+      if (!noEq) {
+        const [k, v] = a.slice(2).split('=');
+        if (k === 'prefixes') prefixesRawValues.push(v);
+        else out[k] = v;
+        continue;
+      }
+      if (a === '--srcDir') out.srcDir = args[++i];
+      else if (a === '--prefixes') {
+        // collect subsequent tokens until next -- as a single logical value
+        const vals = [];
+        let j = i + 1;
+        while (j < args.length && !args[j].startsWith('--')) {
+          vals.push(args[j]);
+          j++;
+        }
+        prefixesRawValues.push(vals.join(' '));
+        i = j - 1;
+      }
+      else if (a === '--outFile') out.outFile = args[++i];
+      else if (a === '--exportFolderName') out.exportFolderName = args[++i];
+      else if (a === '--mode') out.bareImportsMode = args[++i];
+      else if (a === '--verbose') out.verbose = true;
+      else if (a === '--recursive') out.recursive = true;
+      else if (a === '--no-recursive') out.recursive = false;
+    }
+  }
+  if (out.prefixes) prefixesRawValues.push(out.prefixes);
+  if (prefixesRawValues.length > 0) {
+    const outArr = [];
+    function pushParsed(v) {
+      const val = String(v).trim();
+      if (!val) return;
+      try {
+        const parsed = JSON.parse(val);
+        if (Array.isArray(parsed)) {
+          for (const p of parsed) if (p) outArr.push(String(p));
+          return;
+        }
+      } catch (e) {}
+      if (val.indexOf(',') !== -1) {
+        for (const p of val.split(',').map(s => s.trim()).filter(Boolean)) outArr.push(p);
+        return;
+      }
+      if (val.indexOf(' ') !== -1) {
+        for (const p of val.split(/\s+/).map(s => s.trim()).filter(Boolean)) outArr.push(p);
+        return;
+      }
+      outArr.push(val);
+    }
+    for (const r of prefixesRawValues) pushParsed(r);
+    out.prefixes = Array.from(new Set(outArr));
   }
   return out;
 }
