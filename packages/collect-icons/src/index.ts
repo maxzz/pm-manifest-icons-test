@@ -2,6 +2,7 @@ import fg from 'fast-glob';
 import { Plugin } from 'vite';
 import path from 'path';
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import ts from 'typescript';
 
 function createLogger(verbose: boolean) {
@@ -28,6 +29,7 @@ export interface CollectIconsOptions {
   exportFolderName?: string; // optional folder name to make exports relative to (e.g. 'app' -> 'app/..')
   bareImports?: boolean; // if true, emit bare module specifiers starting at exportFolderName (e.g. 'app/...'). If false, emit './app/...'
   bareImportsMode?: 'bare' | 'prefixed' | 'absolute'; // 'bare' => app/..., 'prefixed' => ./app/..., 'absolute' => /app/...
+  recursive?: boolean; // whether to collect files recursively under srcDir (default: true)
 }
 
 function extractNames(contents: string, fileName = 'file.ts'): string[] {
@@ -73,12 +75,46 @@ function extractNames(contents: string, fileName = 'file.ts'): string[] {
   return Array.from(names);
 }
 
-async function collectNamesWithProgram(rootDir: string) {
-  // collect all TS/TSX/JS files under rootDir
-  const files = await fg(['**/*.{ts,tsx,js,jsx,mjs,cjs}'], { cwd: rootDir, absolute: true });
-  const compilerOptions: ts.CompilerOptions = { allowJs: true, jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ESNext, moduleResolution: ts.ModuleResolutionKind.NodeJs, baseUrl: process.cwd() };
-  const host = ts.createCompilerHost(compilerOptions);
-  const program = ts.createProgram(files, compilerOptions, host);
+async function collectNamesWithProgram(rootDir: string, recursive = true) {
+  // collect all TS/TSX/JS files under rootDir (respect recursive flag)
+  const pattern = recursive ? '**/*.{ts,tsx,js,jsx,mjs,cjs}' : '*.{ts,tsx,js,jsx,mjs,cjs}';
+  const files = await fg([pattern], { cwd: rootDir, absolute: true });
+
+  // Try to find a tsconfig (tsconfig.app.json preferred) up the directory tree from rootDir
+  function findTsconfig(startDir: string): string | null {
+    let cur = path.resolve(startDir);
+    while (true) {
+      const tryApp = path.join(cur, 'tsconfig.app.json');
+      const tryRoot = path.join(cur, 'tsconfig.json');
+      if (fsSync.existsSync(tryApp)) return tryApp;
+      if (fsSync.existsSync(tryRoot)) return tryRoot;
+      const parent = path.dirname(cur);
+      if (parent === cur) return null;
+      cur = parent;
+    }
+  }
+
+  let program: ts.Program;
+    let compilerOptions: ts.CompilerOptions = { allowJs: true, jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ESNext, moduleResolution: ts.ModuleResolutionKind.NodeJs, baseUrl: process.cwd() };
+    const tsconfigPath = findTsconfig(rootDir);
+  if (tsconfigPath) {
+    // Read and parse the tsconfig using TypeScript APIs so we respect paths/baseUrl/etc.
+    const read = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
+    if (!read.error) {
+      const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, path.dirname(tsconfigPath));
+      const cfgFiles = parsed.fileNames && parsed.fileNames.length > 0 ? parsed.fileNames : files;
+        compilerOptions = parsed.options as ts.CompilerOptions || compilerOptions;
+      const host = ts.createCompilerHost(compilerOptions || {});
+      program = ts.createProgram(cfgFiles, compilerOptions || {}, host);
+    } else {
+      // fallback to simple program
+      const host = ts.createCompilerHost(compilerOptions);
+      program = ts.createProgram(files, compilerOptions, host);
+    }
+  } else {
+    const host = ts.createCompilerHost(compilerOptions);
+    program = ts.createProgram(files, compilerOptions, host);
+  }
 
   const normalizedRoot = path.normalize(rootDir).toLowerCase();
   const sourceFileMap = new Map(program.getSourceFiles().map(sf => [path.normalize(sf.fileName), sf] as const));
@@ -168,7 +204,9 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
   const outFile = opts.outFile || 'packages/collect-icons/generated/collected-icons.ts';
 
   const base = path.isAbsolute(srcDir) ? srcDir : path.resolve(process.cwd(), srcDir);
-  const entries = await fg(['**/*.{tsx,ts,jsx,js,svg}'], { cwd: base, absolute: true });
+  const recursive = opts.recursive !== undefined ? !!opts.recursive : true;
+  const pattern = recursive ? '**/*.{tsx,ts,jsx,js,svg}' : '*.{tsx,ts,jsx,js,svg}';
+  const entries = await fg([pattern], { cwd: base, absolute: true });
 
   const dest = path.isAbsolute(outFile) ? outFile : path.resolve(process.cwd(), outFile);
   const destDir = path.dirname(dest);
@@ -178,7 +216,7 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
   const allNames: string[] = [];
 
   // Use TypeScript Program to resolve exports and re-exports across files inside base
-  const programNames = await collectNamesWithProgram(base);
+  const programNames = await collectNamesWithProgram(base, recursive);
   for (const [file, names] of programNames.entries()) {
     if (names.length === 0) continue;
     let importPath: string;

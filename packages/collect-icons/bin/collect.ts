@@ -10,7 +10,13 @@ function parseArgs() {
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a.startsWith('--')) {
-      const key = a.slice(2);
+      let key = a.slice(2);
+      // support --no-xxx boolean negation
+      if (key.startsWith('no-')) {
+        key = key.slice(3);
+        map.set(key, 'false');
+        continue;
+      }
       const next = args[i + 1];
       if (!next || next.startsWith('--')) {
         map.set(key, 'true');
