@@ -27,6 +27,7 @@ export interface CollectIconsOptions {
   verbose?: boolean; // print debug info
   exportFolderName?: string; // optional folder name to make exports relative to (e.g. 'app' -> 'app/..')
   bareImports?: boolean; // if true, emit bare module specifiers starting at exportFolderName (e.g. 'app/...'). If false, emit './app/...'
+  bareImportsMode?: 'bare' | 'prefixed' | 'absolute'; // 'bare' => app/..., 'prefixed' => ./app/..., 'absolute' => /app/...
 }
 
 function extractNames(contents: string, fileName = 'file.ts'): string[] {
@@ -102,11 +103,14 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
       if (idx >= 0) {
         const relParts = parts.slice(idx);
         const baseSpec = relParts.join('/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
-        if (opts.bareImports) {
-          // emit bare import specifier starting at the folder name
+        const mode = opts.bareImportsMode || (opts.bareImports ? 'bare' : 'prefixed');
+        if (mode === 'bare') {
           importPath = baseSpec;
+        } else if (mode === 'prefixed') {
+          importPath = './' + baseSpec;
+        } else if (mode === 'absolute') {
+          importPath = '/' + baseSpec;
         } else {
-          // emit a './' prefixed specifier (./app/...) so it isn't a bare package specifier
           importPath = './' + baseSpec;
         }
       } else {
