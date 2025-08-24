@@ -7,10 +7,10 @@ import collectIconsPlugin from 'collect-icons';
 export default defineConfig({
     base: '',
     plugins: [
-    react(),
-    tailwindcss(),
-    // collect icons during build
-    collectIconsPlugin({ exportFolderName: 'app', bareImportsMode: 'bare' }),
+        react(),
+        tailwindcss(),
+        // collect icons during build
+        //collectIconsPlugin({ exportFolderName: 'app', bareImportsMode: 'bare' }), // not needed so far
     ],
     resolve: {
         alias: {
