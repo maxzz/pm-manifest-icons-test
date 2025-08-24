@@ -61,3 +61,15 @@ pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/
 ```
 
 This uses the small `bin/collect.js` wrapper which calls the built `dist/index.js`.
+
+CI example (GitHub Actions)
+--------------------------------
+Add the following job/step to your workflow to ensure the `collect-test` runner builds in CI and the collector runs:
+
+```yaml
+- name: Install and run collect-test
+	run: |
+		pnpm install
+		pnpm --filter collect-test run build
+		pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli-ci.ts --exportFolderName app --mode bare --verbose --recursive
+```
