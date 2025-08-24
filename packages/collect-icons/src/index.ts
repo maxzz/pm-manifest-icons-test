@@ -25,6 +25,7 @@ export interface CollectIconsOptions {
   srcDir?: string; // absolute or relative to process.cwd()
   outFile?: string; // output TypeScript file path (will be created)
   verbose?: boolean; // print debug info
+  exportFolderName?: string; // optional folder name to make exports relative to (e.g. 'app' -> 'app/..')
 }
 
 function extractNames(contents: string, fileName = 'file.ts'): string[] {
@@ -93,8 +94,21 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
     const names = extractNames(contents);
     if (names.length === 0) continue;
 
-    const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
-    const importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
+    let importPath: string;
+    if (opts.exportFolderName) {
+      const parts = file.split(/[/\\]+/);
+      const idx = parts.indexOf(opts.exportFolderName);
+      if (idx >= 0) {
+        const relParts = parts.slice(idx);
+        importPath = relParts.join('/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+      } else {
+        const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+        importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
+      }
+    } else {
+      const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+      importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
+    }
     groups[importPath] = groups[importPath] || [];
     groups[importPath].push(...names);
     allNames.push(...names);
