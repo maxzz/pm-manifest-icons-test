@@ -5,6 +5,8 @@ export interface CollectIconsOptions {
   outFile?: string;
 }
 
+export declare function collectIcons(opts?: CollectIconsOptions): Promise<{ dest: string; names: string[] }>;
+
 declare function collectIconsPlugin(opts?: CollectIconsOptions): Plugin;
 
 export default collectIconsPlugin;
