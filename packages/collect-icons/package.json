@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "types": "src/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "build:test": "pnpm --filter collect-icons-test run build"
+  "build": "tsc -p tsconfig.json",
+  "build:test": "pnpm --filter collect-icons-test run build",
+  "collect": "node ./bin/collect.js"
   },
   "dependencies": {
     "fast-glob": "^3.2.12"
@@ -16,4 +17,5 @@
     "vite": "^6.3.5",
     "@types/node": "^20.0.0"
   }
+  
 }

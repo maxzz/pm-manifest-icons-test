@@ -51,3 +51,13 @@ TypeScript `paths` (tsconfig.json):
 ```
 
 When you set `exportFolderName: 'app'` and `bareImportsMode: 'bare'`, the plugin will emit imports like `from 'app/...'` which the Vite alias and tsconfig paths above will resolve correctly.
+
+CLI
+---
+You can run the collector directly from the package with:
+
+```
+pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-icons/test/collected-cli.ts --exportFolderName app --mode bare --verbose
+```
+
+This uses the small `bin/collect.js` wrapper which calls the built `dist/index.js`.

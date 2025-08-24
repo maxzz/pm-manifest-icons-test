@@ -31,8 +31,8 @@ export interface CollectIconsOptions {
 }
 
 function extractNames(contents: string, fileName = 'file.ts'): string[] {
+  // simple fallback that parses a single file when Program is not used
   const names = new Set<string>();
-
   const ext = path.extname(fileName).toLowerCase();
   const kind = ext === '.tsx' ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
   const sf = ts.createSourceFile(fileName, contents, ts.ScriptTarget.ESNext, true, kind);
@@ -44,13 +44,11 @@ function extractNames(contents: string, fileName = 'file.ts'): string[] {
   }
 
   function visit(node: ts.Node) {
-    // exported function or class declarations: export function Foo() {}, export class Foo {}
     if ((ts.isFunctionDeclaration(node) || ts.isClassDeclaration(node)) && node.modifiers) {
       const isExported = node.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
       if (isExported) addIfMatches((node as any).name);
     }
 
-    // exported variables: export const Foo = ...
     if (ts.isVariableStatement(node) && node.modifiers) {
       const isExported = node.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
       if (isExported) {
@@ -60,7 +58,6 @@ function extractNames(contents: string, fileName = 'file.ts'): string[] {
       }
     }
 
-    // export { A, B as C } from '...'  OR export { A, B }
     if (ts.isExportDeclaration(node) && node.exportClause && ts.isNamedExports(node.exportClause)) {
       for (const spec of node.exportClause.elements) {
         const exportedName = spec.name.text;
@@ -68,14 +65,103 @@ function extractNames(contents: string, fileName = 'file.ts'): string[] {
       }
     }
 
-    // export default X (not handled) or export assignment - ignore
-
     ts.forEachChild(node, visit);
   }
 
   visit(sf);
 
   return Array.from(names);
+}
+
+async function collectNamesWithProgram(rootDir: string) {
+  // collect all TS/TSX/JS files under rootDir
+  const files = await fg(['**/*.{ts,tsx,js,jsx,mjs,cjs}'], { cwd: rootDir, absolute: true });
+  const compilerOptions: ts.CompilerOptions = { allowJs: true, jsx: ts.JsxEmit.React, target: ts.ScriptTarget.ESNext, moduleResolution: ts.ModuleResolutionKind.NodeJs, baseUrl: process.cwd() };
+  const host = ts.createCompilerHost(compilerOptions);
+  const program = ts.createProgram(files, compilerOptions, host);
+
+  const normalizedRoot = path.normalize(rootDir).toLowerCase();
+  const sourceFileMap = new Map(program.getSourceFiles().map(sf => [path.normalize(sf.fileName), sf] as const));
+
+  // First pass: collect direct exports from each source file (declarations and export { A, B })
+  const directExports = new Map<string, string[]>();
+  for (const sf of program.getSourceFiles()) {
+    const nf = path.normalize(sf.fileName).toLowerCase();
+    if (!nf.startsWith(normalizedRoot)) continue;
+    const names: string[] = [];
+    function addIf(id?: ts.Identifier) {
+      if (!id) return;
+      const n = id.text;
+      if (n.startsWith('SvgSymbol') || n.startsWith('Symbol')) names.push(n);
+    }
+    for (const stmt of sf.statements) {
+      if ((ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt)) && stmt.modifiers) {
+        if (stmt.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) addIf((stmt as any).name);
+      }
+      if (ts.isVariableStatement(stmt) && stmt.modifiers) {
+        if (stmt.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
+          for (const decl of stmt.declarationList.declarations) if (ts.isIdentifier(decl.name)) addIf(decl.name);
+        }
+      }
+      if (ts.isExportDeclaration(stmt) && stmt.exportClause && ts.isNamedExports(stmt.exportClause) && !stmt.moduleSpecifier) {
+        for (const el of stmt.exportClause.elements) {
+          if (ts.isIdentifier(el.name)) addIf(el.name);
+        }
+      }
+    }
+    if (names.length > 0) directExports.set(sf.fileName, Array.from(new Set(names)));
+  }
+
+  // Resolve re-exports transitively using module resolution
+  const cache = new Map<string, string[]>();
+  function resolveExports(fileName: string): string[] {
+    if (cache.has(fileName)) return cache.get(fileName)!;
+    const result = new Set<string>();
+    const sf = sourceFileMap.get(fileName);
+    if (!sf) {
+      cache.set(fileName, []);
+      return [];
+    }
+    // add direct exports
+    const direct = directExports.get(fileName) || [];
+    for (const n of direct) result.add(n);
+
+    // process export declarations with moduleSpecifier
+    for (const stmt of sf.statements) {
+      if (ts.isExportDeclaration(stmt) && stmt.moduleSpecifier) {
+        const ms = (stmt.moduleSpecifier as ts.StringLiteral).text;
+        const resolved = ts.resolveModuleName(ms, fileName, compilerOptions, ts.sys);
+        if (resolved && resolved.resolvedModule && resolved.resolvedModule.resolvedFileName) {
+          const target = resolved.resolvedModule.resolvedFileName;
+          // if named exports are specified, include only those names
+          if (stmt.exportClause && ts.isNamedExports(stmt.exportClause)) {
+            for (const el of stmt.exportClause.elements) {
+              const nm = el.name.text;
+              if (nm.startsWith('SvgSymbol') || nm.startsWith('Symbol')) result.add(nm);
+            }
+          } else {
+            // re-export all exported names from target
+            const childNames = resolveExports(target);
+            for (const n of childNames) result.add(n);
+          }
+        }
+      }
+    }
+
+    const arr = Array.from(result);
+    cache.set(fileName, arr);
+    return arr;
+  }
+
+  const exportedNames = new Map<string, string[]>();
+  for (const file of sourceFileMap.keys()) {
+    const nf = path.normalize(file).toLowerCase();
+    if (!nf.startsWith(normalizedRoot)) continue;
+    const names = resolveExports(file);
+    if (names.length > 0) exportedNames.set(file, names);
+  }
+
+  return exportedNames;
 }
 export async function collectIcons(opts: CollectIconsOptions = {}) {
   const srcDir = opts.srcDir || 'packages/app/src/components/ui/icons/symbols/all-other';
@@ -91,11 +177,10 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
   const groups: Record<string, string[]> = {};
   const allNames: string[] = [];
 
-  for (const file of entries) {
-    const contents = await fs.readFile(file, 'utf8');
-    const names = extractNames(contents);
+  // Use TypeScript Program to resolve exports and re-exports across files inside base
+  const programNames = await collectNamesWithProgram(base);
+  for (const [file, names] of programNames.entries()) {
     if (names.length === 0) continue;
-
     let importPath: string;
     if (opts.exportFolderName) {
       const parts = file.split(/[/\\]+/);
