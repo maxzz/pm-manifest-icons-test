@@ -2,28 +2,57 @@ import fg from 'fast-glob';
 import { Plugin } from 'vite';
 import path from 'path';
 import fs from 'fs/promises';
+import ts from 'typescript';
 
 export interface CollectIconsOptions {
   srcDir?: string; // absolute or relative to process.cwd()
   outFile?: string; // output TypeScript file path (will be created)
 }
 
-function extractNames(contents: string): string[] {
+function extractNames(contents: string, fileName = 'file.ts'): string[] {
   const names = new Set<string>();
-  const simpleRe = /export\s+(?:function|const|let|var|class)\s+([A-Za-z$_][A-Za-z0-9$_]*)/g;
-  let m: RegExpExecArray | null;
-  while ((m = simpleRe.exec(contents))) {
-    const n = m[1];
+
+  const ext = path.extname(fileName).toLowerCase();
+  const kind = ext === '.tsx' ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const sf = ts.createSourceFile(fileName, contents, ts.ScriptTarget.ESNext, true, kind);
+
+  function addIfMatches(name?: ts.Identifier) {
+    if (!name) return;
+    const n = name.text;
     if (n.startsWith('SvgSymbol') || n.startsWith('Symbol')) names.add(n);
   }
 
-  const namedExportRe = /export\s*{([^}]+)}/g;
-  while ((m = namedExportRe.exec(contents))) {
-    const list = m[1].split(',').map(s => s.split('as')[0].trim());
-    for (const item of list) {
-      if (item && (item.startsWith('SvgSymbol') || item.startsWith('Symbol'))) names.add(item);
+  function visit(node: ts.Node) {
+    // exported function or class declarations: export function Foo() {}, export class Foo {}
+    if ((ts.isFunctionDeclaration(node) || ts.isClassDeclaration(node)) && node.modifiers) {
+      const isExported = node.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
+      if (isExported) addIfMatches((node as any).name);
     }
+
+    // exported variables: export const Foo = ...
+    if (ts.isVariableStatement(node) && node.modifiers) {
+      const isExported = node.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
+      if (isExported) {
+        for (const decl of node.declarationList.declarations) {
+          if (ts.isIdentifier(decl.name)) addIfMatches(decl.name);
+        }
+      }
+    }
+
+    // export { A, B as C } from '...'  OR export { A, B }
+    if (ts.isExportDeclaration(node) && node.exportClause && ts.isNamedExports(node.exportClause)) {
+      for (const spec of node.exportClause.elements) {
+        const exportedName = spec.name.text;
+        if (exportedName.startsWith('SvgSymbol') || exportedName.startsWith('Symbol')) names.add(exportedName);
+      }
+    }
+
+    // export default X (not handled) or export assignment - ignore
+
+    ts.forEachChild(node, visit);
   }
+
+  visit(sf);
 
   return Array.from(names);
 }
