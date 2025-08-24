@@ -1,5 +1,5 @@
 {
-  "name": "collect-icons-test",
+  "name": "collect-test",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "collect-icons": "workspace:.."
+    "collect-icons": "workspace:../collect-icons"
   },
   "devDependencies": {
     "typescript": "~5.8.3",
