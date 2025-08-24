@@ -5,6 +5,7 @@ export interface CollectIconsOptions {
   outFile?: string;
   verbose?: boolean;
   exportFolderName?: string;
+  bareImports?: boolean;
 }
 
 export declare function collectIcons(opts?: CollectIconsOptions): Promise<{ dest: string; names: string[] }>;

@@ -26,6 +26,7 @@ export interface CollectIconsOptions {
   outFile?: string; // output TypeScript file path (will be created)
   verbose?: boolean; // print debug info
   exportFolderName?: string; // optional folder name to make exports relative to (e.g. 'app' -> 'app/..')
+  bareImports?: boolean; // if true, emit bare module specifiers starting at exportFolderName (e.g. 'app/...'). If false, emit './app/...'
 }
 
 function extractNames(contents: string, fileName = 'file.ts'): string[] {
@@ -100,7 +101,14 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
       const idx = parts.indexOf(opts.exportFolderName);
       if (idx >= 0) {
         const relParts = parts.slice(idx);
-        importPath = relParts.join('/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+        const baseSpec = relParts.join('/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+        if (opts.bareImports) {
+          // emit bare import specifier starting at the folder name
+          importPath = baseSpec;
+        } else {
+          // emit a './' prefixed specifier (./app/...) so it isn't a bare package specifier
+          importPath = './' + baseSpec;
+        }
       } else {
         const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
         importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
