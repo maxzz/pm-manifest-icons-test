@@ -1,0 +1,16 @@
+{
+  "name": "collect-icons-test",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "collect-icons": "workspace:.."
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "@types/node": "^20.0.0"
+  }
+}

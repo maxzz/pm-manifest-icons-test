@@ -1,0 +1,19 @@
+{
+  "name": "collect-icons",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:test": "pnpm --filter collect-icons-test run build"
+  },
+  "dependencies": {
+    "fast-glob": "^3.2.12"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "@types/node": "^20.0.0"
+  }
+}
