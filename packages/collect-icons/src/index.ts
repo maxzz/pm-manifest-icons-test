@@ -30,9 +30,10 @@ export interface CollectIconsOptions {
   bareImports?: boolean; // if true, emit bare module specifiers starting at exportFolderName (e.g. 'app/...'). If false, emit './app/...'
   bareImportsMode?: 'bare' | 'prefixed' | 'absolute'; // 'bare' => app/..., 'prefixed' => ./app/..., 'absolute' => /app/...
   recursive?: boolean; // whether to collect files recursively under srcDir (default: true)
+  prefixes?: string[]; // list of name prefixes to detect (default: ['SvgSymbol','Symbol'])
 }
 
-function extractNames(contents: string, fileName = 'file.ts'): string[] {
+function extractNames(contents: string, fileName = 'file.ts', prefixes: string[] = ['SvgSymbol', 'Symbol']): string[] {
   // simple fallback that parses a single file when Program is not used
   const names = new Set<string>();
   const ext = path.extname(fileName).toLowerCase();
@@ -42,7 +43,7 @@ function extractNames(contents: string, fileName = 'file.ts'): string[] {
   function addIfMatches(name?: ts.Identifier) {
     if (!name) return;
     const n = name.text;
-    if (n.startsWith('SvgSymbol') || n.startsWith('Symbol')) names.add(n);
+    for (const p of prefixes) if (n.startsWith(p)) { names.add(n); break; }
   }
 
   function visit(node: ts.Node) {
@@ -63,7 +64,7 @@ function extractNames(contents: string, fileName = 'file.ts'): string[] {
     if (ts.isExportDeclaration(node) && node.exportClause && ts.isNamedExports(node.exportClause)) {
       for (const spec of node.exportClause.elements) {
         const exportedName = spec.name.text;
-        if (exportedName.startsWith('SvgSymbol') || exportedName.startsWith('Symbol')) names.add(exportedName);
+        for (const p of prefixes) if (exportedName.startsWith(p)) { names.add(exportedName); break; }
       }
     }
 
@@ -75,7 +76,7 @@ function extractNames(contents: string, fileName = 'file.ts'): string[] {
   return Array.from(names);
 }
 
-async function collectNamesWithProgram(rootDir: string, recursive = true) {
+async function collectNamesWithProgram(rootDir: string, recursive = true, prefixes: string[] = ['SvgSymbol', 'Symbol']) {
   // collect all TS/TSX/JS files under rootDir (respect recursive flag)
   const pattern = recursive ? '**/*.{ts,tsx,js,jsx,mjs,cjs}' : '*.{ts,tsx,js,jsx,mjs,cjs}';
   const files = await fg([pattern], { cwd: rootDir, absolute: true });
@@ -128,18 +129,18 @@ async function collectNamesWithProgram(rootDir: string, recursive = true) {
     function addIf(id?: ts.Identifier) {
       if (!id) return;
       const n = id.text;
-      if (n.startsWith('SvgSymbol') || n.startsWith('Symbol')) names.push(n);
+      for (const p of prefixes) if (n.startsWith(p)) { names.push(n); break; }
     }
     for (const stmt of sf.statements) {
       if ((ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt)) && stmt.modifiers) {
         if (stmt.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) addIf((stmt as any).name);
       }
       if (ts.isVariableStatement(stmt) && stmt.modifiers) {
-        if (stmt.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
+      if (stmt.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
           for (const decl of stmt.declarationList.declarations) if (ts.isIdentifier(decl.name)) addIf(decl.name);
         }
       }
-      if (ts.isExportDeclaration(stmt) && stmt.exportClause && ts.isNamedExports(stmt.exportClause) && !stmt.moduleSpecifier) {
+    if (ts.isExportDeclaration(stmt) && stmt.exportClause && ts.isNamedExports(stmt.exportClause) && !stmt.moduleSpecifier) {
         for (const el of stmt.exportClause.elements) {
           if (ts.isIdentifier(el.name)) addIf(el.name);
         }
@@ -173,7 +174,7 @@ async function collectNamesWithProgram(rootDir: string, recursive = true) {
           if (stmt.exportClause && ts.isNamedExports(stmt.exportClause)) {
             for (const el of stmt.exportClause.elements) {
               const nm = el.name.text;
-              if (nm.startsWith('SvgSymbol') || nm.startsWith('Symbol')) result.add(nm);
+              for (const p of prefixes) if (nm.startsWith(p)) { result.add(nm); break; }
             }
           } else {
             // re-export all exported names from target
@@ -216,7 +217,8 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
   const allNames: string[] = [];
 
   // Use TypeScript Program to resolve exports and re-exports across files inside base
-  const programNames = await collectNamesWithProgram(base, recursive);
+  const prefixes = Array.isArray(opts.prefixes) && opts.prefixes.length > 0 ? opts.prefixes : ['SvgSymbol', 'Symbol'];
+  const programNames = await collectNamesWithProgram(base, recursive, prefixes);
   const logger = createLogger(!!opts.verbose);
   // If the program-based resolver found nothing, fall back to per-file AST extraction
   if ((!programNames || programNames.size === 0) && entries.length > 0) {
@@ -224,7 +226,7 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
     for (const file of entries) {
       try {
         const contents = await fs.readFile(file, 'utf8');
-        const names = extractNames(contents, file);
+        const names = extractNames(contents, file, prefixes);
         if (names && names.length > 0) {
           // compute importPath same as later logic expects real file path keys
           programNames.set(file, names);

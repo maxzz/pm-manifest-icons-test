@@ -8,6 +8,7 @@ function parseArgs() {
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === '--srcDir') out.srcDir = args[++i];
+  else if (a === '--prefixes') out.prefixes = args[++i];
     else if (a === '--outFile') out.outFile = args[++i];
     else if (a === '--exportFolderName') out.exportFolderName = args[++i];
     else if (a === '--mode') out.bareImportsMode = args[++i];
@@ -24,6 +25,15 @@ async function main() {
   opts.outFile = path.resolve(process.cwd(), opts.outFile || 'collected-cli.ts');
   opts.exportFolderName = opts.exportFolderName || 'app';
   opts.bareImportsMode = opts.bareImportsMode || 'bare';
+  // parse prefixes if provided as JSON array string or comma-separated
+  if (typeof opts.prefixes === 'string') {
+    try {
+      const pjson = JSON.parse(opts.prefixes);
+      if (Array.isArray(pjson)) opts.prefixes = pjson.map(String);
+    } catch (e) {
+      opts.prefixes = opts.prefixes.split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
   const res = await collectIcons(opts);
   console.log(`Wrote ${res.names.length} names to ${res.dest}`);
 }

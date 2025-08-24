@@ -30,6 +30,17 @@ function parseArgs() {
   const srcDir = map.get('srcDir') || 'packages/app/src/components/ui/icons/symbols/all-other';
   const outFile = map.get('outFile') || 'collected-cli.ts';
   const exportFolderName = map.get('exportFolderName') || 'app';
+  const prefixesRaw = map.get('prefixes');
+  let prefixes: string[] | undefined;
+  if (prefixesRaw) {
+    // try JSON parse first, else treat as comma-separated
+    try {
+      const parsed = JSON.parse(prefixesRaw);
+      if (Array.isArray(parsed)) prefixes = parsed.map(String);
+    } catch (e) {
+      prefixes = prefixesRaw.split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
   const mode = (map.get('mode') || 'bare') as Mode;
   if (!['bare', 'prefixed', 'absolute'].includes(mode)) {
     throw new Error("Invalid mode: must be one of 'bare' | 'prefixed' | 'absolute'");
@@ -42,6 +53,7 @@ function parseArgs() {
     exportFolderName: string;
     mode: Mode;
     verbose: boolean;
+  prefixes?: string[] | undefined;
   };
 }
 
@@ -51,6 +63,7 @@ async function main() {
     srcDir: path.resolve(process.cwd(), argv.srcDir),
     outFile: path.resolve(process.cwd(), argv.outFile),
     exportFolderName: argv.exportFolderName,
+  prefixes: argv.prefixes,
     bareImportsMode: argv.mode as any,
     verbose: argv.verbose,
   });
