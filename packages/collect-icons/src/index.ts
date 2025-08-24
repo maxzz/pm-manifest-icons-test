@@ -217,6 +217,23 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
 
   // Use TypeScript Program to resolve exports and re-exports across files inside base
   const programNames = await collectNamesWithProgram(base, recursive);
+  const logger = createLogger(!!opts.verbose);
+  // If the program-based resolver found nothing, fall back to per-file AST extraction
+  if ((!programNames || programNames.size === 0) && entries.length > 0) {
+    logger.warn('program-empty-fallback', { reason: 'program resolver returned no names, falling back to per-file extractor', filesChecked: entries.length });
+    for (const file of entries) {
+      try {
+        const contents = await fs.readFile(file, 'utf8');
+        const names = extractNames(contents, file);
+        if (names && names.length > 0) {
+          // compute importPath same as later logic expects real file path keys
+          programNames.set(file, names);
+        }
+      } catch (err) {
+        logger.warn('read-fail', { file, err: String(err) });
+      }
+    }
+  }
   for (const [file, names] of programNames.entries()) {
     if (names.length === 0) continue;
     let importPath: string;
@@ -270,7 +287,6 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
   await fs.writeFile(dest, lines.join('\n'), 'utf8');
 
   // Structured logging
-  const logger = createLogger(!!opts.verbose);
   logger.info('collected', { count: uniqueNames.length, dest });
   if (opts.verbose) {
     logger.debug('files', { files: entries });

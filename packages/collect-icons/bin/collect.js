@@ -12,6 +12,8 @@ function parseArgs() {
     else if (a === '--exportFolderName') out.exportFolderName = args[++i];
     else if (a === '--mode') out.bareImportsMode = args[++i];
     else if (a === '--verbose') out.verbose = true;
+    else if (a === '--recursive') out.recursive = true;
+    else if (a === '--no-recursive') out.recursive = false;
   }
   return out;
 }
