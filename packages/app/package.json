@@ -8,18 +8,18 @@
         "@types/react": "^19.1.2",
         "@types/react-dom": "^19.1.2",
         "@vitejs/plugin-react": "^4.4.1",
+        "collect-icons": "workspace:*",
         "globals": "^16.0.0",
         "typescript": "~5.8.3",
-        "vite": "^6.3.5",
-        "collect-icons": "workspace:*"
+        "vite": "^6.3.5"
     },
     "dependencies": {
-        "@tailwindcss/vite": "^4.1.10",
+        "@tailwindcss/vite": "^4.1.12",
         "pm-manifest-icons": "^1.0.6",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "tailwind-merge": "^3.3.1",
-        "tailwindcss": "^4.1.10"
+        "tailwindcss": "^4.1.12"
     },
     "scripts": {
         "tsc": "tsc -p tsconfig.app.json -w",

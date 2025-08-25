@@ -4,7 +4,7 @@ console.log(collectedSymbols);
 
 export function SectionMain() {
     return (
-        <main className="flex flex-col items-center justify-center w-full h-full bg-background-light">
+        <main className="flex items-center justify-center w-full h-full bg-my">
             {Object.values(collectedSymbols).map((Icon) => (
                 <div key={Icon.name}>
                     <Icon className="size-6" />
