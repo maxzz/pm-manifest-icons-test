@@ -1,6 +1,6 @@
 export function SectionFooter() {
     return (
-        <footer className="w-full h-16 bg-background-light flex items-center justify-between">
+        <footer className="px-4 w-full h-8 text-xs bg-background-light flex items-center justify-between">
             App footer
         </footer>
     );
