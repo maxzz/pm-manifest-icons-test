@@ -2,7 +2,7 @@
 
 Vite plugin to collect icon and symbol sources from the app package.
 
-Usage (from monorepo root):
+## Usage (from monorepo root):
 
 1. Build the plugin
 
@@ -10,6 +10,7 @@ Usage (from monorepo root):
 pnpm --filter collect-icons build
 pnpm --filter collect-test run build
 pnpm --filter collect-test start
+```
 2. Run the test runner
 
 The test runner will write `collected-test.json` into `packages/collect-test` when successful.
@@ -48,13 +49,14 @@ TypeScript `paths` (tsconfig.json):
 			"app/*": ["packages/app/src/*"]
 		}
 	}
+}
 ```
 
 When you set `exportFolderName: 'app'` and `bareImportsMode: 'bare'`, the plugin will emit imports like `from 'app/...'` which the Vite alias and tsconfig paths above will resolve correctly.
 pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli.ts --exportFolderName app --mode bare --verbose
 CLI
----
-You can run the collector directly from the package with:
+
+#### You can run the collector directly from the package with:
 
 ```
 pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli.ts --exportFolderName app --mode bare --verbose
@@ -62,7 +64,7 @@ pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/
 
 This uses the small `bin/collect.js` wrapper which calls the built `dist/index.js`.
 
-Required arguments
+#### Required arguments
 ------------------
 The CLI requires the following arguments:
 
@@ -73,7 +75,7 @@ The CLI requires the following arguments:
 	- Space-separated (single flag): `--prefixes SvgSymbol Symbol`
 	- Repeated flag: `--prefixes SvgSymbol --prefixes Symbol`
 
-Quick example
+#### Quick example
 -------------
 
 ```
@@ -87,7 +89,7 @@ Missing required argument: --prefixes
 Usage: collect.js --srcDir <path> --prefixes <prefixes> [--outFile <file>] [--exportFolderName <name>] [--mode bare|prefixed|absolute] [--verbose]
 ```
 
-CI example (GitHub Actions)
+#### CI example (GitHub Actions)
 --------------------------------
 Add the following job/step to your workflow to ensure the `collect-test` runner builds in CI and the collector runs:
 
