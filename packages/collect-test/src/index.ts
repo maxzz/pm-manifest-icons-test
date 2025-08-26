@@ -1,8 +1,8 @@
 import path from 'path';
-import { collectIcons } from 'collect-icons';
 // Import the local package directly during development so tsc resolves types/files.
 // When published or installed as a workspace dependency, you can switch back to
-// `import { collectIcons } from 'collect-icons';`
+import { collectIcons } from '../../../packages/collect-icons/src/index';
+// import { collectIcons } from 'collect-icons';
 
 async function main() {
     const res = await collectIcons({

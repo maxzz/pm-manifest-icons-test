@@ -323,15 +323,24 @@ async function generateCollectedFile(args: {
     const { groups, uniqueNames, dest, destDir, opts, entries, logger } = args;
     const lines: string[] = [];
     lines.push(...generateFileHeader());
-    // re-exports
+    // imports
     for (const [importPath, names] of Object.entries(groups)) {
         const unique = Array.from(new Set(names)).sort();
-        lines.push(`export { ${unique.join(', ')} } from '${importPath}';`);
+        if (unique.length === 0) continue;
+        lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
     }
     lines.push('');
+    // export a single object containing all collected components
+    if (uniqueNames.length > 0) {
+        lines.push(`export const collectedIconComponents = { \n    ${uniqueNames.join(',\n    ')},\n};`);
+        lines.push('');
+    } else {
+        lines.push('export const collectedIconComponents = {};');
+        lines.push('');
+    }
     // names array and type
-    lines.push(`export const collectedIconNames = [${uniqueNames.map(n => `'${n}'`).join(', ')}] as const;`);
-    lines.push('export type CollectedIconName = typeof collectedIconNames[number];');
+    lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
+    lines.push('export type CollectedIconType = typeof collectedIconNames[number];');
 
     await fs.writeFile(dest, lines.join('\n'), 'utf8');
 
