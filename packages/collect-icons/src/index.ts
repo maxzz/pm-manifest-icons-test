@@ -292,6 +292,25 @@ function generateFileHeader(): string[] {
     ];
 }
 
+/**
+ * Generate the collected icons TypeScript file, write it to disk, and log summary info.
+ *
+ * @param args.groups - Mapping of import path -> exported symbol names.
+ *   Example: { 'app/components/ui/icon': ['SvgSymbolFoo','SymbolFoo'] }
+ * @param args.uniqueNames - Deduplicated, sorted list of all collected names.
+ *   Example: ['SvgSymbolFoo','SymbolFoo']
+ * @param args.dest - Destination file path to write.
+ *   Example: 'packages/collect-test/collected.ts'
+ * @param args.destDir - Directory of the destination file.
+ *   Example: 'packages/collect-test'
+ * @param args.opts - Collector options passed through (prefixes, verbose, exportFolderName, etc.).
+ *   Example: { prefixes: ['SvgSymbol','Symbol'], exportFolderName: 'app', verbose: true }
+ * @param args.entries - Array of source files scanned; used for verbose logging.
+ *   Example: ['packages/app/.../06-folder.tsx', 'packages/app/.../08-dot.tsx']
+ * @param args.logger - Logger returned from createLogger(verbose).
+ *
+ * @returns Promise resolving to an object { dest, names } where `names` is the list of collected names.
+ */
 async function generateCollectedFile(args: {
     groups: Record<string, string[]>;
     uniqueNames: string[];
