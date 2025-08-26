@@ -80,7 +80,7 @@ export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ na
     }
 
     // deduplicate names
-    const uniqueNames = Array.from(new Set(allNames)).sort();
+    const uniqueNames = Array.from(new Set(allNames))//.sort(); // don't sort by component name and keep order by import path
 
     const cnt = await generateCollectedFile({ groups, uniqueNames });
     await fs.writeFile(dest, cnt, 'utf8');

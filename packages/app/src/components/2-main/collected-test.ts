@@ -29,118 +29,118 @@ import { SvgSymbolAppWebIeText, SymbolAppWebIeText } from '../ui/icons/symbols/a
 import { SvgSymbolAppWebIeDot, SymbolAppWebIeDot } from '../ui/icons/symbols/app/6-app-web-ie-dot';
 import { SvgSymbolIconManualMode, SymbolManualMode } from '../ui/icons/symbols/app/7-app-manual-mode';
 
-export const collectedIconComponents = { 
-    SvgSymbolAppWebChrome,
-    SvgSymbolAppWebIe,
-    SvgSymbolAppWebIeDot,
-    SvgSymbolAppWebIeText,
-    SvgSymbolAppWin,
-    SvgSymbolCatalog,
-    SvgSymbolChevronDoubleDown,
-    SvgSymbolChevronDown,
-    SvgSymbolChevronRight,
-    SvgSymbolChevronUp,
-    SvgSymbolClassicCheck,
-    SvgSymbolClassicCheckEmpty,
-    SvgSymbolCode,
-    SvgSymbolCross,
-    SvgSymbolDot,
-    SvgSymbolEllipsis,
-    SvgSymbolFire,
-    SvgSymbolFolder,
-    SvgSymbolFormChange,
-    SvgSymbolFormLogin,
-    SvgSymbolForms,
-    SvgSymbolIconManualMode,
-    SvgSymbolInfo,
-    SvgSymbolOpenLink,
-    SvgSymbolPen,
-    SvgSymbolQuestion,
-    SvgSymbolWarning,
-    SymbolAppWebChrome,
-    SymbolAppWebIe,
-    SymbolAppWebIeDot,
-    SymbolAppWebIeText,
-    SymbolAppWin,
-    SymbolCatalog,
-    SymbolCheckbox,
-    SymbolCheckboxEmpty,
-    SymbolChevronDown,
-    SymbolChevronRight,
-    SymbolChevronUp,
-    SymbolCode,
-    SymbolCross,
-    SymbolDot,
-    SymbolDoubleDown,
-    SymbolEllipsis,
-    SymbolFire,
-    SymbolFolder,
-    SymbolFormChange,
-    SymbolFormLogin,
-    SymbolForms,
-    SymbolInfo,
-    SymbolManualMode,
-    SymbolOpenLink,
-    SymbolPen,
-    SymbolQuestion,
-    SymbolWarning,
+export const collectedIconComponents = {
+    SvgSymbolFolder,               // from '../../app/src/components/ui/icons/symbols/all-other/06-folder'
+    SymbolFolder,                  // from '../../app/src/components/ui/icons/symbols/all-other/06-folder'
+    SvgSymbolDot,                  // from '../../app/src/components/ui/icons/symbols/all-other/08-dot'
+    SymbolDot,                     // from '../../app/src/components/ui/icons/symbols/all-other/08-dot'
+    SvgSymbolOpenLink,             // from '../../app/src/components/ui/icons/symbols/all-other/09-open-link'
+    SymbolOpenLink,                // from '../../app/src/components/ui/icons/symbols/all-other/09-open-link'
+    SvgSymbolCross,                // from '../../app/src/components/ui/icons/symbols/all-other/13-cross'
+    SymbolCross,                   // from '../../app/src/components/ui/icons/symbols/all-other/13-cross'
+    SvgSymbolPen,                  // from '../../app/src/components/ui/icons/symbols/all-other/14-pen'
+    SymbolPen,                     // from '../../app/src/components/ui/icons/symbols/all-other/14-pen'
+    SvgSymbolFormLogin,            // from '../../app/src/components/ui/icons/symbols/all-other/15-form-login'
+    SymbolFormLogin,               // from '../../app/src/components/ui/icons/symbols/all-other/15-form-login'
+    SvgSymbolFormChange,           // from '../../app/src/components/ui/icons/symbols/all-other/16-form-change'
+    SymbolFormChange,              // from '../../app/src/components/ui/icons/symbols/all-other/16-form-change'
+    SvgSymbolClassicCheck,         // from '../../app/src/components/ui/icons/symbols/all-other/17-checkbox-classic'
+    SymbolCheckbox,                // from '../../app/src/components/ui/icons/symbols/all-other/17-checkbox-classic'
+    SvgSymbolClassicCheckEmpty,    // from '../../app/src/components/ui/icons/symbols/all-other/18-checkbox-classic-empty'
+    SymbolCheckboxEmpty,           // from '../../app/src/components/ui/icons/symbols/all-other/18-checkbox-classic-empty'
+    SvgSymbolChevronDown,          // from '../../app/src/components/ui/icons/symbols/all-other/20-chevron-down'
+    SymbolChevronDown,             // from '../../app/src/components/ui/icons/symbols/all-other/20-chevron-down'
+    SvgSymbolChevronUp,            // from '../../app/src/components/ui/icons/symbols/all-other/21-chevron-up'
+    SymbolChevronUp,               // from '../../app/src/components/ui/icons/symbols/all-other/21-chevron-up'
+    SvgSymbolChevronDoubleDown,    // from '../../app/src/components/ui/icons/symbols/all-other/22-chevron-double-down'
+    SymbolDoubleDown,              // from '../../app/src/components/ui/icons/symbols/all-other/22-chevron-double-down'
+    SvgSymbolChevronRight,         // from '../../app/src/components/ui/icons/symbols/all-other/23-chevron-right'
+    SymbolChevronRight,            // from '../../app/src/components/ui/icons/symbols/all-other/23-chevron-right'
+    SvgSymbolFire,                 // from '../../app/src/components/ui/icons/symbols/all-other/24-fire'
+    SymbolFire,                    // from '../../app/src/components/ui/icons/symbols/all-other/24-fire'
+    SvgSymbolInfo,                 // from '../../app/src/components/ui/icons/symbols/all-other/24-info'
+    SymbolInfo,                    // from '../../app/src/components/ui/icons/symbols/all-other/24-info'
+    SvgSymbolQuestion,             // from '../../app/src/components/ui/icons/symbols/all-other/24-question'
+    SymbolQuestion,                // from '../../app/src/components/ui/icons/symbols/all-other/24-question'
+    SvgSymbolWarning,              // from '../../app/src/components/ui/icons/symbols/all-other/24-warning'
+    SymbolWarning,                 // from '../../app/src/components/ui/icons/symbols/all-other/24-warning'
+    SvgSymbolCode,                 // from '../../app/src/components/ui/icons/symbols/all-other/25-code'
+    SymbolCode,                    // from '../../app/src/components/ui/icons/symbols/all-other/25-code'
+    SvgSymbolForms,                // from '../../app/src/components/ui/icons/symbols/all-other/25-forms'
+    SymbolForms,                   // from '../../app/src/components/ui/icons/symbols/all-other/25-forms'
+    SvgSymbolEllipsis,             // from '../../app/src/components/ui/icons/symbols/all-other/26-ellipsis'
+    SymbolEllipsis,                // from '../../app/src/components/ui/icons/symbols/all-other/26-ellipsis'
+    SvgSymbolAppWebChrome,         // from '../../app/src/components/ui/icons/symbols/app/1-app-web-chrome'
+    SymbolAppWebChrome,            // from '../../app/src/components/ui/icons/symbols/app/1-app-web-chrome'
+    SvgSymbolAppWin,               // from '../../app/src/components/ui/icons/symbols/app/2-app-win'
+    SymbolAppWin,                  // from '../../app/src/components/ui/icons/symbols/app/2-app-win'
+    SvgSymbolCatalog,              // from '../../app/src/components/ui/icons/symbols/app/3-app-fcat'
+    SymbolCatalog,                 // from '../../app/src/components/ui/icons/symbols/app/3-app-fcat'
+    SvgSymbolAppWebIe,             // from '../../app/src/components/ui/icons/symbols/app/4-app-web-ie'
+    SymbolAppWebIe,                // from '../../app/src/components/ui/icons/symbols/app/4-app-web-ie'
+    SvgSymbolAppWebIeText,         // from '../../app/src/components/ui/icons/symbols/app/5-app-web-ie-text'
+    SymbolAppWebIeText,            // from '../../app/src/components/ui/icons/symbols/app/5-app-web-ie-text'
+    SvgSymbolAppWebIeDot,          // from '../../app/src/components/ui/icons/symbols/app/6-app-web-ie-dot'
+    SymbolAppWebIeDot,             // from '../../app/src/components/ui/icons/symbols/app/6-app-web-ie-dot'
+    SvgSymbolIconManualMode,       // from '../../app/src/components/ui/icons/symbols/app/7-app-manual-mode'
+    SymbolManualMode,              // from '../../app/src/components/ui/icons/symbols/app/7-app-manual-mode'
 };
 
 export const collectedIconNames = [
-    'SvgSymbolAppWebChrome',
-    'SvgSymbolAppWebIe',
-    'SvgSymbolAppWebIeDot',
-    'SvgSymbolAppWebIeText',
-    'SvgSymbolAppWin',
-    'SvgSymbolCatalog',
-    'SvgSymbolChevronDoubleDown',
-    'SvgSymbolChevronDown',
-    'SvgSymbolChevronRight',
-    'SvgSymbolChevronUp',
-    'SvgSymbolClassicCheck',
-    'SvgSymbolClassicCheckEmpty',
-    'SvgSymbolCode',
-    'SvgSymbolCross',
-    'SvgSymbolDot',
-    'SvgSymbolEllipsis',
-    'SvgSymbolFire',
     'SvgSymbolFolder',
-    'SvgSymbolFormChange',
-    'SvgSymbolFormLogin',
-    'SvgSymbolForms',
-    'SvgSymbolIconManualMode',
-    'SvgSymbolInfo',
-    'SvgSymbolOpenLink',
-    'SvgSymbolPen',
-    'SvgSymbolQuestion',
-    'SvgSymbolWarning',
-    'SymbolAppWebChrome',
-    'SymbolAppWebIe',
-    'SymbolAppWebIeDot',
-    'SymbolAppWebIeText',
-    'SymbolAppWin',
-    'SymbolCatalog',
-    'SymbolCheckbox',
-    'SymbolCheckboxEmpty',
-    'SymbolChevronDown',
-    'SymbolChevronRight',
-    'SymbolChevronUp',
-    'SymbolCode',
-    'SymbolCross',
-    'SymbolDot',
-    'SymbolDoubleDown',
-    'SymbolEllipsis',
-    'SymbolFire',
     'SymbolFolder',
-    'SymbolFormChange',
-    'SymbolFormLogin',
-    'SymbolForms',
-    'SymbolInfo',
-    'SymbolManualMode',
+    'SvgSymbolDot',
+    'SymbolDot',
+    'SvgSymbolOpenLink',
     'SymbolOpenLink',
+    'SvgSymbolCross',
+    'SymbolCross',
+    'SvgSymbolPen',
     'SymbolPen',
+    'SvgSymbolFormLogin',
+    'SymbolFormLogin',
+    'SvgSymbolFormChange',
+    'SymbolFormChange',
+    'SvgSymbolClassicCheck',
+    'SymbolCheckbox',
+    'SvgSymbolClassicCheckEmpty',
+    'SymbolCheckboxEmpty',
+    'SvgSymbolChevronDown',
+    'SymbolChevronDown',
+    'SvgSymbolChevronUp',
+    'SymbolChevronUp',
+    'SvgSymbolChevronDoubleDown',
+    'SymbolDoubleDown',
+    'SvgSymbolChevronRight',
+    'SymbolChevronRight',
+    'SvgSymbolFire',
+    'SymbolFire',
+    'SvgSymbolInfo',
+    'SymbolInfo',
+    'SvgSymbolQuestion',
     'SymbolQuestion',
+    'SvgSymbolWarning',
     'SymbolWarning',
+    'SvgSymbolCode',
+    'SymbolCode',
+    'SvgSymbolForms',
+    'SymbolForms',
+    'SvgSymbolEllipsis',
+    'SymbolEllipsis',
+    'SvgSymbolAppWebChrome',
+    'SymbolAppWebChrome',
+    'SvgSymbolAppWin',
+    'SymbolAppWin',
+    'SvgSymbolCatalog',
+    'SymbolCatalog',
+    'SvgSymbolAppWebIe',
+    'SymbolAppWebIe',
+    'SvgSymbolAppWebIeText',
+    'SymbolAppWebIeText',
+    'SvgSymbolAppWebIeDot',
+    'SymbolAppWebIeDot',
+    'SvgSymbolIconManualMode',
+    'SymbolManualMode',
 ] as const;
 
 export type CollectedIconType = typeof collectedIconNames[number];

@@ -22,18 +22,25 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     const nameToImport = new Map<string, string>();
     for (const [importPath, componentNames] of Object.entries(groups)) {
         for (const n of componentNames) {
-            if (!nameToImport.has(n)) nameToImport.set(n, importPath);
+            if (!nameToImport.has(n)) {
+                nameToImport.set(n, importPath);
+            }
         }
     }
 
     if (uniqueNames.length > 0) {
         lines.push('export const collectedIconComponents = {');
-        for (const n of uniqueNames) {
-            const from = nameToImport.get(n);
+        // compute max name length so comments can be aligned
+        const maxNameLen = uniqueNames.reduce((m, s) => Math.max(m, s.length), 0) + 4; // 4 for the space after the name and comma
+
+        for (const componentName of uniqueNames) {
+            const from = nameToImport.get(componentName);
             if (from) {
-                lines.push(`    ${n}, // from '${from}'`);
+                const padding = ' '.repeat(Math.max(1, maxNameLen - componentName.length));
+                // name, then padding so all comments line up vertically
+                lines.push(`    ${componentName},${padding}// from '${from}'`);
             } else {
-                lines.push(`    ${n},`);
+                lines.push(`    ${componentName},`);
             }
         }
         lines.push('};');
@@ -57,3 +64,6 @@ function generateFileHeader(): string[] {
         ''
     ];
 }
+
+//TODO: add exort root or extract root from comments
+//TODO: instead of comment add this as second member of each component name
