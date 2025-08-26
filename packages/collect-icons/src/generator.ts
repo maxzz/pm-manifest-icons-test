@@ -18,8 +18,26 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     lines.push('');
 
     // 2. export a single object containing all collected components
+    // Annotate each entry with a comment showing where it was imported from (first occurrence)
+    const nameToImport = new Map<string, string>();
+    for (const [importPath, componentNames] of Object.entries(groups)) {
+        for (const n of componentNames) {
+            if (!nameToImport.has(n)) nameToImport.set(n, importPath);
+        }
+    }
+
     if (uniqueNames.length > 0) {
-        lines.push(`export const collectedIconComponents = { \n    ${uniqueNames.join(',\n    ')},\n};\n`);
+        lines.push('export const collectedIconComponents = {');
+        for (const n of uniqueNames) {
+            const from = nameToImport.get(n);
+            if (from) {
+                lines.push(`    ${n}, // from '${from}'`);
+            } else {
+                lines.push(`    ${n},`);
+            }
+        }
+        lines.push('};');
+        lines.push('');
     } else {
         lines.push('export const collectedIconComponents = {};\n');
     }
