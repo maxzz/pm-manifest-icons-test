@@ -211,7 +211,14 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
     // deduplicate names
     const uniqueNames = Array.from(new Set(allNames)).sort();
 
-    return await generateCollectedFile({ groups, uniqueNames, dest, destDir, opts, entries, logger });
+    const res = await generateCollectedFile({ groups, uniqueNames, dest });
+    // Structured logging moved here so caller owns logging
+    logger.info('collected', { count: res.names.length, dest: res.dest });
+    if (opts.verbose) {
+        logger.debug('files', { files: entries });
+        logger.debug('names', { names: res.names });
+    }
+    return res;
 }
 
 export default function collectIconsPlugin(opts: CollectIconsOptions = {}): Plugin {
@@ -293,7 +300,9 @@ function generateFileHeader(): string[] {
 }
 
 /**
- * Generate the collected icons TypeScript file, write it to disk, and log summary info.
+ * Generate the collected icons TypeScript file and write it to disk.
+ *
+ * Only the needed parameters are accepted: `groups`, `uniqueNames`, and `dest`.
  *
  * @param args.groups - Mapping of import path -> exported symbol names.
  *   Example: { 'app/components/ui/icon': ['SvgSymbolFoo','SymbolFoo'] }
@@ -301,13 +310,6 @@ function generateFileHeader(): string[] {
  *   Example: ['SvgSymbolFoo','SymbolFoo']
  * @param args.dest - Destination file path to write.
  *   Example: 'packages/collect-test/collected.ts'
- * @param args.destDir - Directory of the destination file.
- *   Example: 'packages/collect-test'
- * @param args.opts - Collector options passed through (prefixes, verbose, exportFolderName, etc.).
- *   Example: { prefixes: ['SvgSymbol','Symbol'], exportFolderName: 'app', verbose: true }
- * @param args.entries - Array of source files scanned; used for verbose logging.
- *   Example: ['packages/app/.../06-folder.tsx', 'packages/app/.../08-dot.tsx']
- * @param args.logger - Logger returned from createLogger(verbose).
  *
  * @returns Promise resolving to an object { dest, names } where `names` is the list of collected names.
  */
@@ -315,12 +317,8 @@ async function generateCollectedFile(args: {
     groups: Record<string, string[]>;
     uniqueNames: string[];
     dest: string;
-    destDir: string;
-    opts: CollectIconsOptions;
-    entries: string[];
-    logger: ReturnType<typeof createLogger>;
 }) {
-    const { groups, uniqueNames, dest, destDir, opts, entries, logger } = args;
+    const { groups, uniqueNames, dest } = args;
     const lines: string[] = [];
     lines.push(...generateFileHeader());
     // imports
@@ -343,13 +341,6 @@ async function generateCollectedFile(args: {
     lines.push('export type CollectedIconType = typeof collectedIconNames[number];');
 
     await fs.writeFile(dest, lines.join('\n'), 'utf8');
-
-    // Structured logging
-    logger.info('collected', { count: uniqueNames.length, dest });
-    if (opts.verbose) {
-        logger.debug('files', { files: entries });
-        logger.debug('names', { names: uniqueNames });
-    }
 
     return { dest, names: uniqueNames };
 }
