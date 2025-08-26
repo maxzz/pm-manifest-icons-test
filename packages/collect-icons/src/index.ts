@@ -1,9 +1,10 @@
-import fg from 'fast-glob';
-import { Plugin } from 'vite';
 import path from 'path';
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import ts from 'typescript';
+import fg from 'fast-glob';
+import { type Plugin } from 'vite';
+import { generateCollectedFile } from './generator';
 
 export interface CollectIconsOptions {
     srcDir?: string;                // absolute or relative to process.cwd()
@@ -14,6 +15,104 @@ export interface CollectIconsOptions {
     bareImportsMode?: 'bare' | 'prefixed' | 'absolute'; // 'bare' => app/..., 'prefixed' => ./app/..., 'absolute' => /app/...
     recursive?: boolean;            // whether to collect files recursively under srcDir (default: true)
     prefixes?: string[];            // list of name prefixes to detect (default: ['SvgSymbol','Symbol'])
+}
+
+export default function collectIconsPlugin(opts: CollectIconsOptions = {}): Plugin {
+    return {
+        name: 'vite-plugin-collect-icons',
+        apply: 'build',
+        async buildStart() {
+            await collectIcons(opts);
+        }
+    };
+}
+
+export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ names: string[]; dest: string; }> {
+    const srcDir = opts.srcDir || 'packages/app/src/components/ui/icons/symbols/all-other';
+    const outFile = opts.outFile || 'packages/collect-icons/generated/collected-icons.ts';
+
+    const base = path.isAbsolute(srcDir) ? srcDir : path.resolve(process.cwd(), srcDir);
+    const recursive = opts.recursive !== undefined ? !!opts.recursive : true;
+    const pattern = recursive ? '**/*.{tsx,ts,jsx,js,svg}' : '*.{tsx,ts,jsx,js,svg}';
+    const entries = await fg([pattern], { cwd: base, absolute: true });
+
+    const dest = path.isAbsolute(outFile) ? outFile : path.resolve(process.cwd(), outFile);
+    const destDir = path.dirname(dest);
+    await fs.mkdir(destDir, { recursive: true });
+
+    const groups: Record<string, string[]> = {};
+    const allNames: string[] = [];
+
+    // Use TypeScript Program to resolve exports and re-exports across files inside base
+    const prefixes = Array.isArray(opts.prefixes) && opts.prefixes.length > 0 ? opts.prefixes : ['SvgSymbol', 'Symbol'];
+    const programNames = await collectNamesWithProgram(base, recursive, prefixes);
+    const logger = createLogger(!!opts.verbose);
+
+    // If the program-based resolver found nothing, fall back to per-file AST extraction
+    if ((!programNames || programNames.size === 0) && entries.length > 0) {
+        logger.warn('program-empty-fallback', { reason: 'program resolver returned no names, falling back to per-file extractor', filesChecked: entries.length });
+        for (const file of entries) {
+            try {
+                const contents = await fs.readFile(file, 'utf8');
+                const names = extractNames(contents, file, prefixes);
+                if (names && names.length > 0) {
+                    // compute importPath same as later logic expects real file path keys
+                    programNames.set(file, names);
+                }
+            } catch (err) {
+                logger.warn('read-fail', { file, err: String(err) });
+            }
+        }
+    }
+
+    for (const [file, names] of programNames.entries()) {
+        if (names.length === 0) continue;
+        let importPath: string;
+        if (opts.exportFolderName) {
+            const parts = file.split(/[/\\]+/);
+            const idx = parts.indexOf(opts.exportFolderName);
+            if (idx >= 0) {
+                const relParts = parts.slice(idx);
+                const baseSpec = relParts.join('/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+                const mode = opts.bareImportsMode || (opts.bareImports ? 'bare' : 'prefixed');
+                if (mode === 'bare') {
+                    importPath = baseSpec;
+                } else if (mode === 'prefixed') {
+                    importPath = './' + baseSpec;
+                } else if (mode === 'absolute') {
+                    importPath = '/' + baseSpec;
+                } else {
+                    importPath = './' + baseSpec;
+                }
+            } else {
+                const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+                importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
+            }
+        } else {
+            const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
+            importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
+        }
+        groups[importPath] = groups[importPath] || [];
+        groups[importPath].push(...names);
+        allNames.push(...names);
+    }
+
+    // deduplicate names
+    const uniqueNames = Array.from(new Set(allNames)).sort();
+
+    const cnt = await generateCollectedFile({ groups, uniqueNames });
+    await fs.writeFile(dest, cnt, 'utf8');
+
+    // Structured logging moved here so caller owns logging
+    logger.info('collected', { count: uniqueNames.length, dest });
+    if (opts.verbose) {
+        logger.debug('files', { files: entries });
+        logger.debug('names', { names: uniqueNames });
+    }
+    return {
+        names: uniqueNames,
+        dest,
+    };
 }
 
 async function collectNamesWithProgram(rootDir: string, recursive = true, prefixes: string[] = ['SvgSymbol', 'Symbol']) {
@@ -140,101 +239,6 @@ async function collectNamesWithProgram(rootDir: string, recursive = true, prefix
 
     return exportedNames;
 }
-export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ names: string[]; dest: string; }> {
-    const srcDir = opts.srcDir || 'packages/app/src/components/ui/icons/symbols/all-other';
-    const outFile = opts.outFile || 'packages/collect-icons/generated/collected-icons.ts';
-
-    const base = path.isAbsolute(srcDir) ? srcDir : path.resolve(process.cwd(), srcDir);
-    const recursive = opts.recursive !== undefined ? !!opts.recursive : true;
-    const pattern = recursive ? '**/*.{tsx,ts,jsx,js,svg}' : '*.{tsx,ts,jsx,js,svg}';
-    const entries = await fg([pattern], { cwd: base, absolute: true });
-
-    const dest = path.isAbsolute(outFile) ? outFile : path.resolve(process.cwd(), outFile);
-    const destDir = path.dirname(dest);
-    await fs.mkdir(destDir, { recursive: true });
-
-    const groups: Record<string, string[]> = {};
-    const allNames: string[] = [];
-
-    // Use TypeScript Program to resolve exports and re-exports across files inside base
-    const prefixes = Array.isArray(opts.prefixes) && opts.prefixes.length > 0 ? opts.prefixes : ['SvgSymbol', 'Symbol'];
-    const programNames = await collectNamesWithProgram(base, recursive, prefixes);
-    const logger = createLogger(!!opts.verbose);
-    // If the program-based resolver found nothing, fall back to per-file AST extraction
-    if ((!programNames || programNames.size === 0) && entries.length > 0) {
-        logger.warn('program-empty-fallback', { reason: 'program resolver returned no names, falling back to per-file extractor', filesChecked: entries.length });
-        for (const file of entries) {
-            try {
-                const contents = await fs.readFile(file, 'utf8');
-                const names = extractNames(contents, file, prefixes);
-                if (names && names.length > 0) {
-                    // compute importPath same as later logic expects real file path keys
-                    programNames.set(file, names);
-                }
-            } catch (err) {
-                logger.warn('read-fail', { file, err: String(err) });
-            }
-        }
-    }
-    for (const [file, names] of programNames.entries()) {
-        if (names.length === 0) continue;
-        let importPath: string;
-        if (opts.exportFolderName) {
-            const parts = file.split(/[/\\]+/);
-            const idx = parts.indexOf(opts.exportFolderName);
-            if (idx >= 0) {
-                const relParts = parts.slice(idx);
-                const baseSpec = relParts.join('/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
-                const mode = opts.bareImportsMode || (opts.bareImports ? 'bare' : 'prefixed');
-                if (mode === 'bare') {
-                    importPath = baseSpec;
-                } else if (mode === 'prefixed') {
-                    importPath = './' + baseSpec;
-                } else if (mode === 'absolute') {
-                    importPath = '/' + baseSpec;
-                } else {
-                    importPath = './' + baseSpec;
-                }
-            } else {
-                const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
-                importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
-            }
-        } else {
-            const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
-            importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
-        }
-        groups[importPath] = groups[importPath] || [];
-        groups[importPath].push(...names);
-        allNames.push(...names);
-    }
-
-    // deduplicate names
-    const uniqueNames = Array.from(new Set(allNames)).sort();
-
-    const cnt = await generateCollectedFile({ groups, uniqueNames });
-    await fs.writeFile(dest, cnt, 'utf8');
-
-    // Structured logging moved here so caller owns logging
-    logger.info('collected', { count: uniqueNames.length, dest });
-    if (opts.verbose) {
-        logger.debug('files', { files: entries });
-        logger.debug('names', { names: uniqueNames });
-    }
-    return {
-        names: uniqueNames,
-        dest,
-    };
-}
-
-export default function collectIconsPlugin(opts: CollectIconsOptions = {}): Plugin {
-    return {
-        name: 'vite-plugin-collect-icons',
-        apply: 'build',
-        async buildStart() {
-            await collectIcons(opts);
-        }
-    };
-}
 
 function extractNames(contents: string, fileName = 'file.ts', prefixes: string[] = ['SvgSymbol', 'Symbol']): string[] {
     // simple fallback that parses a single file when Program is not used
@@ -294,46 +298,4 @@ function createLogger(verbose: boolean) {
         warn: (msg: string, obj?: any) => console.warn(format('warn', msg, obj)),
         error: (msg: string, obj?: any) => console.error(format('error', msg, obj)),
     };
-}
-
-function generateFileHeader(): string[] {
-    return [
-        '// Auto-generated by vite-plugin-collect-icons. Do not edit.',
-        '/* eslint-disable */',
-        ''
-    ];
-}
-
-/**
- * Generate the collected icons TypeScript file and write it to disk.
- *
- * @param groups - Mapping of import path -> exported symbol names. Example: { 'app/components/ui/icon': ['SvgSymbolFoo','SymbolFoo'] }
- * @param uniqueNames - Deduplicated, sorted list of all collected names. Example: ['SvgSymbolFoo','SymbolFoo']
- *
- * @returns Promise resolving to an object { dest, names } where `names` is the list of collected names.
- */
-async function generateCollectedFile({ groups, uniqueNames }: { groups: Record<string, string[]>; uniqueNames: string[]; }): Promise<string> {
-    const lines: string[] = [];
-    lines.push(...generateFileHeader());
-
-    // 1. imports
-    for (const [importPath, componentNames] of Object.entries(groups)) {
-        const unique = Array.from(new Set(componentNames)).sort();
-        unique.length && lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
-    }
-    lines.push('');
-
-    // 2. export a single object containing all collected components
-    if (uniqueNames.length > 0) {
-        lines.push(`export const collectedIconComponents = { \n    ${uniqueNames.join(',\n    ')},\n};\n`);
-    } else {
-        lines.push('export const collectedIconComponents = {};\n');
-    }
-
-    // 2. names array and type
-    lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
-    lines.push('export type CollectedIconType = typeof collectedIconNames[number];');
-
-    const rv = lines.join('\n');
-    return rv;
 }
