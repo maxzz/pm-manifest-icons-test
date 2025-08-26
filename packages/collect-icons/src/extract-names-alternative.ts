@@ -2,19 +2,26 @@ import path from 'path';
 import ts from 'typescript';
 
 /**
- * simple fallback that parses a single file when Program is not used
+ * Simple fallback that parses a single file when Program is not used
+ * @param sourceText - file contents
+ * @param filename - file name w/ path like 'path/file.ts'
+ * @param prefixes - list of name prefixes to detect (default: ['SvgSymbol','Symbol'])
+ * @returns list of detected names
  */
-export function extractNames(contents: string, fileName = 'file.ts', prefixes: string[] = ['SvgSymbol', 'Symbol']): string[] {
+export function extractNamesFromFile(sourceText: string, filename: string, prefixes: string[]): string[] {
     const names = new Set<string>();
-    const ext = path.extname(fileName).toLowerCase();
+    const ext = path.extname(filename).toLowerCase();
     const kind = ext === '.tsx' ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
-    const sf = ts.createSourceFile(fileName, contents, ts.ScriptTarget.ESNext, true, kind);
+    const sf = ts.createSourceFile(filename, sourceText, ts.ScriptTarget.ESNext, true, kind);
 
     function addIfMatches(name?: ts.Identifier) {
         if (!name) return;
         const n = name.text;
         for (const p of prefixes) {
-            if (n.startsWith(p)) { names.add(n); break; }
+            if (n.startsWith(p)) {
+                names.add(n);
+                break;
+            }
         }
     }
 
@@ -41,7 +48,10 @@ export function extractNames(contents: string, fileName = 'file.ts', prefixes: s
             for (const spec of node.exportClause.elements) {
                 const exportedName = spec.name.text;
                 for (const p of prefixes) {
-                    if (exportedName.startsWith(p)) { names.add(exportedName); break; }
+                    if (exportedName.startsWith(p)) {
+                        names.add(exportedName);
+                        break;
+                    }
                 }
             }
         }

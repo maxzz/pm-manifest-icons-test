@@ -5,7 +5,7 @@ import { type CollectIconsOptions } from './types';
 import { createLogger } from './logger';
 import { generateCollectedFile } from './generator';
 import { collectNamesWithProgram } from './extract-names-with-program';
-import { extractNames } from './extract-names-alternative';
+import { extractNamesFromFile } from './extract-names-alternative';
 
 export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ names: string[]; dest: string; }> {
     const logger = createLogger(!!opts.verbose);
@@ -33,16 +33,16 @@ export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ na
     if (programNames.size === 0 && filenames.length > 0) {
         logger.info('program-empty-fallback', { reason: 'program resolver returned no names, falling back to per-file extractor', filesChecked: filenames.length });
 
-        for (const file of filenames) {
+        for (const filename of filenames) {
             try {
-                const contents = await fs.readFile(file, 'utf8');
-                const names = extractNames(contents, file, prefixes);
+                const contents = await fs.readFile(filename, 'utf8');
+                const names = extractNamesFromFile(contents, filename, prefixes);
                 if (names && names.length > 0) {
                     // compute importPath same as later logic expects real file path keys
-                    programNames.set(file, names);
+                    programNames.set(filename, names);
                 }
             } catch (err) {
-                logger.warn('read-fail', { file, err: String(err) });
+                logger.warn('read-fail', { file: filename, err: String(err) });
             }
         }
     }

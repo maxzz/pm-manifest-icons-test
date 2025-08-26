@@ -3,8 +3,15 @@ import fsSync from 'fs';
 import fg from 'fast-glob';
 import ts from 'typescript';
 
-export async function collectNamesWithProgram(rootDir: string, recursive = true, prefixes: string[] = ['SvgSymbol', 'Symbol']): Promise<Map<string, string[]>> {
-    // collect all TS/TSX/JS files under rootDir (respect recursive flag)
+/**
+ * Collect all TS/TSX/JS files under rootDir (respect recursive flag)
+ * with TypeScript Program to resolve exports and re-exports across files inside base.
+ * @param rootDir - directory to scan
+ * @param recursive - whether to scan recursively under rootDir (default: true)
+ * @param prefixes - list of name prefixes to detect (default: ['SvgSymbol','Symbol'])
+ * @returns Map of file path -> list of detected component names
+ */
+export async function collectNamesWithProgram(rootDir: string, recursive: boolean, prefixes: string[]): Promise<Map<string, string[]>> {
     const pattern = recursive ? '**/*.{ts,tsx,js,jsx,mjs,cjs}' : '*.{ts,tsx,js,jsx,mjs,cjs}';
     const filenames = await fg([pattern], { cwd: rootDir, absolute: true });
 
@@ -64,6 +71,7 @@ export async function collectNamesWithProgram(rootDir: string, recursive = true,
                 if (n.startsWith(p)) { names.push(n); break; }
             }
         }
+
         for (const stmt of sf.statements) {
             if ((ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt)) && stmt.modifiers) {
                 if (stmt.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
@@ -87,11 +95,15 @@ export async function collectNamesWithProgram(rootDir: string, recursive = true,
                 }
             }
         }
-        if (names.length > 0) directExports.set(sf.fileName, Array.from(new Set(names)));
+
+        if (names.length > 0) {
+            directExports.set(sf.fileName, Array.from(new Set(names)));
+        }
     }
 
     // Resolve re-exports transitively using module resolution
     const cache = new Map<string, string[]>();
+
     function resolveExports(fileName: string): string[] {
         if (cache.has(fileName)) {
             return cache.get(fileName)!;
@@ -118,12 +130,16 @@ export async function collectNamesWithProgram(rootDir: string, recursive = true,
 
                 if (resolved && resolved.resolvedModule && resolved.resolvedModule.resolvedFileName) {
                     const target = resolved.resolvedModule.resolvedFileName;
+
                     // if named exports are specified, include only those names
                     if (stmt.exportClause && ts.isNamedExports(stmt.exportClause)) {
                         for (const el of stmt.exportClause.elements) {
                             const nm = el.name.text;
                             for (const p of prefixes) {
-                                if (nm.startsWith(p)) { result.add(nm); break; }
+                                if (nm.startsWith(p)) {
+                                    result.add(nm);
+                                    break;
+                                }
                             }
                         }
                     } else {
