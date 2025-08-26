@@ -21,8 +21,21 @@ import { SvgSymbolWarning, SymbolWarning } from '../../app/src/components/ui/ico
 import { SvgSymbolCode, SymbolCode } from '../../app/src/components/ui/icons/symbols/all-other/25-code';
 import { SvgSymbolForms, SymbolForms } from '../../app/src/components/ui/icons/symbols/all-other/25-forms';
 import { SvgSymbolEllipsis, SymbolEllipsis } from '../../app/src/components/ui/icons/symbols/all-other/26-ellipsis';
+import { SvgSymbolAppWebChrome, SymbolAppWebChrome } from '../../app/src/components/ui/icons/symbols/app/1-app-web-chrome';
+import { SvgSymbolAppWin, SymbolAppWin } from '../../app/src/components/ui/icons/symbols/app/2-app-win';
+import { SvgSymbolCatalog, SymbolCatalog } from '../../app/src/components/ui/icons/symbols/app/3-app-fcat';
+import { SvgSymbolAppWebIe, SymbolAppWebIe } from '../../app/src/components/ui/icons/symbols/app/4-app-web-ie';
+import { SvgSymbolAppWebIeText, SymbolAppWebIeText } from '../../app/src/components/ui/icons/symbols/app/5-app-web-ie-text';
+import { SvgSymbolAppWebIeDot, SymbolAppWebIeDot } from '../../app/src/components/ui/icons/symbols/app/6-app-web-ie-dot';
+import { SvgSymbolIconManualMode, SymbolManualMode } from '../../app/src/components/ui/icons/symbols/app/7-app-manual-mode';
 
 export const collectedIconComponents = { 
+    SvgSymbolAppWebChrome,
+    SvgSymbolAppWebIe,
+    SvgSymbolAppWebIeDot,
+    SvgSymbolAppWebIeText,
+    SvgSymbolAppWin,
+    SvgSymbolCatalog,
     SvgSymbolChevronDoubleDown,
     SvgSymbolChevronDown,
     SvgSymbolChevronRight,
@@ -38,11 +51,18 @@ export const collectedIconComponents = {
     SvgSymbolFormChange,
     SvgSymbolFormLogin,
     SvgSymbolForms,
+    SvgSymbolIconManualMode,
     SvgSymbolInfo,
     SvgSymbolOpenLink,
     SvgSymbolPen,
     SvgSymbolQuestion,
     SvgSymbolWarning,
+    SymbolAppWebChrome,
+    SymbolAppWebIe,
+    SymbolAppWebIeDot,
+    SymbolAppWebIeText,
+    SymbolAppWin,
+    SymbolCatalog,
     SymbolCheckbox,
     SymbolCheckboxEmpty,
     SymbolChevronDown,
@@ -59,6 +79,7 @@ export const collectedIconComponents = {
     SymbolFormLogin,
     SymbolForms,
     SymbolInfo,
+    SymbolManualMode,
     SymbolOpenLink,
     SymbolPen,
     SymbolQuestion,
@@ -66,6 +87,12 @@ export const collectedIconComponents = {
 };
 
 export const collectedIconNames = [
+    'SvgSymbolAppWebChrome',
+    'SvgSymbolAppWebIe',
+    'SvgSymbolAppWebIeDot',
+    'SvgSymbolAppWebIeText',
+    'SvgSymbolAppWin',
+    'SvgSymbolCatalog',
     'SvgSymbolChevronDoubleDown',
     'SvgSymbolChevronDown',
     'SvgSymbolChevronRight',
@@ -81,11 +108,18 @@ export const collectedIconNames = [
     'SvgSymbolFormChange',
     'SvgSymbolFormLogin',
     'SvgSymbolForms',
+    'SvgSymbolIconManualMode',
     'SvgSymbolInfo',
     'SvgSymbolOpenLink',
     'SvgSymbolPen',
     'SvgSymbolQuestion',
     'SvgSymbolWarning',
+    'SymbolAppWebChrome',
+    'SymbolAppWebIe',
+    'SymbolAppWebIeDot',
+    'SymbolAppWebIeText',
+    'SymbolAppWin',
+    'SymbolCatalog',
     'SymbolCheckbox',
     'SymbolCheckboxEmpty',
     'SymbolChevronDown',
@@ -102,6 +136,7 @@ export const collectedIconNames = [
     'SymbolFormLogin',
     'SymbolForms',
     'SymbolInfo',
+    'SymbolManualMode',
     'SymbolOpenLink',
     'SymbolPen',
     'SymbolQuestion',
