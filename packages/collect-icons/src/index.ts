@@ -140,7 +140,7 @@ async function collectNamesWithProgram(rootDir: string, recursive = true, prefix
 
     return exportedNames;
 }
-export async function collectIcons(opts: CollectIconsOptions = {}) {
+export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ names: string[]; dest: string; }> {
     const srcDir = opts.srcDir || 'packages/app/src/components/ui/icons/symbols/all-other';
     const outFile = opts.outFile || 'packages/collect-icons/generated/collected-icons.ts';
 
@@ -211,14 +211,19 @@ export async function collectIcons(opts: CollectIconsOptions = {}) {
     // deduplicate names
     const uniqueNames = Array.from(new Set(allNames)).sort();
 
-    const res = await generateCollectedFile({ groups, uniqueNames, dest });
+    const cnt = await generateCollectedFile({ groups, uniqueNames });
+    await fs.writeFile(dest, cnt, 'utf8');
+
     // Structured logging moved here so caller owns logging
-    logger.info('collected', { count: res.names.length, dest: res.dest });
+    logger.info('collected', { count: uniqueNames.length, dest });
     if (opts.verbose) {
         logger.debug('files', { files: entries });
-        logger.debug('names', { names: res.names });
+        logger.debug('names', { names: uniqueNames });
     }
-    return res;
+    return {
+        names: uniqueNames,
+        dest,
+    };
 }
 
 export default function collectIconsPlugin(opts: CollectIconsOptions = {}): Plugin {
@@ -302,45 +307,33 @@ function generateFileHeader(): string[] {
 /**
  * Generate the collected icons TypeScript file and write it to disk.
  *
- * Only the needed parameters are accepted: `groups`, `uniqueNames`, and `dest`.
- *
- * @param args.groups - Mapping of import path -> exported symbol names.
- *   Example: { 'app/components/ui/icon': ['SvgSymbolFoo','SymbolFoo'] }
- * @param args.uniqueNames - Deduplicated, sorted list of all collected names.
- *   Example: ['SvgSymbolFoo','SymbolFoo']
- * @param args.dest - Destination file path to write.
- *   Example: 'packages/collect-test/collected.ts'
+ * @param groups - Mapping of import path -> exported symbol names. Example: { 'app/components/ui/icon': ['SvgSymbolFoo','SymbolFoo'] }
+ * @param uniqueNames - Deduplicated, sorted list of all collected names. Example: ['SvgSymbolFoo','SymbolFoo']
  *
  * @returns Promise resolving to an object { dest, names } where `names` is the list of collected names.
  */
-async function generateCollectedFile(args: {
-    groups: Record<string, string[]>;
-    uniqueNames: string[];
-    dest: string;
-}) {
-    const { groups, uniqueNames, dest } = args;
+async function generateCollectedFile({ groups, uniqueNames }: { groups: Record<string, string[]>; uniqueNames: string[]; }): Promise<string> {
     const lines: string[] = [];
     lines.push(...generateFileHeader());
-    // imports
+
+    // 1. imports
     for (const [importPath, names] of Object.entries(groups)) {
         const unique = Array.from(new Set(names)).sort();
-        if (unique.length === 0) continue;
-        lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
+        unique.length && lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
     }
     lines.push('');
-    // export a single object containing all collected components
+
+    // 2. export a single object containing all collected components
     if (uniqueNames.length > 0) {
-        lines.push(`export const collectedIconComponents = { \n    ${uniqueNames.join(',\n    ')},\n};`);
-        lines.push('');
+        lines.push(`export const collectedIconComponents = { \n    ${uniqueNames.join(',\n    ')},\n};\n`);
     } else {
-        lines.push('export const collectedIconComponents = {};');
-        lines.push('');
+        lines.push('export const collectedIconComponents = {};\n');
     }
-    // names array and type
+
+    // 2. names array and type
     lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
     lines.push('export type CollectedIconType = typeof collectedIconNames[number];');
 
-    await fs.writeFile(dest, lines.join('\n'), 'utf8');
-
-    return { dest, names: uniqueNames };
+    const rv = lines.join('\n');
+    return rv;
 }
