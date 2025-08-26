@@ -2,6 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "ts-node",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "${workspaceRoot}/packages/collect-test/node_modules/ts-node/dist/bin.js"
+            ],
+            "args": [
+                "${workspaceRoot}/packages/collect-test/src/index.ts"
+            ],
+            "cwd": "${workspaceRoot}/packages/collect-test",
+        },
+        {
             "name": "Launch Chrome for app",
             "request": "launch",
             "type": "chrome",

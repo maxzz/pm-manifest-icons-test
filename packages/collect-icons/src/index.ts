@@ -317,8 +317,8 @@ async function generateCollectedFile({ groups, uniqueNames }: { groups: Record<s
     lines.push(...generateFileHeader());
 
     // 1. imports
-    for (const [importPath, names] of Object.entries(groups)) {
-        const unique = Array.from(new Set(names)).sort();
+    for (const [importPath, componentNames] of Object.entries(groups)) {
+        const unique = Array.from(new Set(componentNames)).sort();
         unique.length && lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
     }
     lines.push('');
