@@ -1,7 +1,9 @@
 [
-  {
-    "key": "ctrl+alt+t",
-    "command": "workbench.action.tasks.runTask",
-    "args": "Open terminal in nearest package"
-  }
+    {
+        "key": "ctrl+alt+t",
+        "command": "extension.multiCommand.execute",
+        "args": {
+            "command": "multiCommand.openTerminalInNearestPackage"
+        }
+    }
 ]
