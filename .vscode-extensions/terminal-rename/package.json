@@ -1,0 +1,31 @@
+{
+  "name": "terminal-rename",
+  "displayName": "Terminal Rename Helper",
+  "description": "Compute nearest packages/<name> and rename active terminal",
+  "version": "0.0.0",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "activationEvents": [
+    "onCommand:terminal-helpers.renameNearestPackageTerminal"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "terminal-helpers.renameNearestPackageTerminal",
+        "title": "Rename terminal to nearest package"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "typescript": "~4.9.5",
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.60.0",
+    "vscode": "^1.1.37"
+  }
+}
