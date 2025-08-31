@@ -1,9 +1,0 @@
-[
-    {
-        "key": "ctrl+alt+t",
-        "command": "extension.multiCommand.execute",
-        "args": {
-            "command": "multiCommand.openTerminalInNearestPackage"
-        }
-    }
-]
