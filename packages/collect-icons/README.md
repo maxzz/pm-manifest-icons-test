@@ -8,18 +8,18 @@ Vite plugin to collect icon and symbol sources from the app package.
 
 ```
 pnpm --filter collect-icons build
-pnpm --filter collect-test run build
-pnpm --filter collect-test start
+pnpm --filter tester run build
+pnpm --filter tester start
 ```
 2. Run the test runner
 
-The test runner will write `collected-test.json` into `packages/collect-test` when successful.
+The test runner will write `collected-test.json` into `packages/tester` when successful.
 ```
 pnpm --filter collect-icons-test run build
 pnpm --filter collect-icons-test start
 ```
 
-The test runner will write `collected-test.json` into `packages/collect-test` when successful.
+The test runner will write `collected-test.json` into `packages/tester` when successful.
 
 Example: make bare imports like `app/...` resolve
 
@@ -53,13 +53,13 @@ TypeScript `paths` (tsconfig.json):
 ```
 
 When you set `exportFolderName: 'app'` and `bareImportsMode: 'bare'`, the plugin will emit imports like `from 'app/...'` which the Vite alias and tsconfig paths above will resolve correctly.
-pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli.ts --exportFolderName app --mode bare --verbose
+pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/tester/collected-cli.ts --exportFolderName app --mode bare --verbose
 CLI
 
 #### You can run the collector directly from the package with:
 
 ```
-pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli.ts --exportFolderName app --mode bare --verbose
+pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/tester/collected-cli.ts --exportFolderName app --mode bare --verbose
 ```
 
 This uses the small `bin/collect.js` wrapper which calls the built `dist/index.js`.
@@ -79,7 +79,7 @@ The CLI requires the following arguments:
 -------------
 
 ```
-node packages\\collect-icons\\bin\\collect.js --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli.ts --prefixes SvgSymbol,Symbol --exportFolderName app --mode bare --verbose
+node packages\\collect-icons\\bin\\collect.js --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/tester/collected-cli.ts --prefixes SvgSymbol,Symbol --exportFolderName app --mode bare --verbose
 ```
 
 When required args are missing the CLI prints a short usage hint, for example:
@@ -91,12 +91,12 @@ Usage: collect.js --srcDir <path> --prefixes <prefixes> [--outFile <file>] [--ex
 
 #### CI example (GitHub Actions)
 --------------------------------
-Add the following job/step to your workflow to ensure the `collect-test` runner builds in CI and the collector runs:
+Add the following job/step to your workflow to ensure the `tester` runner builds in CI and the collector runs:
 
 ```yaml
-- name: Install and run collect-test
+-- name: Install and run tester
 	run: |
 		pnpm install
-		pnpm --filter collect-test run build
-		pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/collect-test/collected-cli-ci.ts --exportFolderName app --mode bare --verbose --recursive
+		pnpm --filter tester run build
+		pnpm --filter collect-icons run collect -- --srcDir packages/app/src/components/ui/icons/symbols/all-other --outFile packages/tester/collected-cli-ci.ts --exportFolderName app --mode bare --verbose --recursive
 ```

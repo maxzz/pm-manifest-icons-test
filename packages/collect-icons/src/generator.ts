@@ -67,3 +67,4 @@ function generateFileHeader(): string[] {
 
 //TODO: add exort root or extract root from comments
 //TODO: instead of comment add this as second member of each component name
+//TODO: app: show folder name if there are multiple

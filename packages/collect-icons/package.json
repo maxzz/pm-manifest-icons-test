@@ -6,9 +6,9 @@
   "types": "src/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-  "build:test": "pnpm --filter collect-test run build",
+  "build:test": "pnpm --filter tester run build",
     "collect": "node ./bin/collect.js",
-  "collect:cli": "ts-node ./bin/collect.ts --srcDir ../app/src/components/ui/icons/symbols/all-other --outFile ../collect-test/collected-cli-recursive.ts --exportFolderName app --mode bare --verbose --recursive"
+  "collect:cli": "ts-node ./bin/collect.ts --srcDir ../app/src/components/ui/icons/symbols/all-other --outFile ../tester/collected-cli-recursive.ts --exportFolderName app --mode bare --verbose --recursive"
   },
   "dependencies": {
     "fast-glob": "^3.2.12"
