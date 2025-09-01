@@ -4,5 +4,6 @@
     --color-my: oklch(0.95 0.0227 288.67);
     --color-hi: oklch(0.81 0.1096 19.74);
     
-    --color-background-light: var(--color-my);
+    /* --color-background-light: var(--color-my); */
+    --color-background-light: var(--color-sky-50);
 }
