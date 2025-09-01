@@ -28,6 +28,15 @@ import { SvgSymbolAppWebIe, SymbolAppWebIe } from '../ui/icons/symbols/app/4-app
 import { SvgSymbolAppWebIeText, SymbolAppWebIeText } from '../ui/icons/symbols/app/5-app-web-ie-text';
 import { SvgSymbolAppWebIeDot, SymbolAppWebIeDot } from '../ui/icons/symbols/app/6-app-web-ie-dot';
 import { SvgSymbolIconManualMode, SymbolManualMode } from '../ui/icons/symbols/app/7-app-manual-mode';
+// import { SvgSymbolManualMode, SymbolManualMode } from '../ui/icons/symbols/symbols-temp/01-manual-mode';
+import { SvgSymbolStitches, SymbolStitches } from '../ui/icons/symbols/symbols-temp/02-stitches';
+// import { SvgSymbolReactSpring, SymbolReactSpring } from '../ui/icons/symbols/symbols-temp/03-react-spring';
+// import { SvgSymbolManualMode, SymbolManualMode } from '../ui/icons/symbols/symbols-temp/apps/01-manual-mode';
+// import { SvgSymbolStitches, SymbolStitches } from '../ui/icons/symbols/symbols-temp/apps/02-stitches';
+import { SvgSymbolReactSpring, SymbolReactSpring } from '../ui/icons/symbols/symbols-temp/apps/03-react-spring';
+import { SvgSymbolIconTv, SymbolTv } from '../ui/icons/symbols/symbols-temp/nav/01-tv';
+import { SvgSymbolGithubLogo, SymbolGithubLogo } from '../ui/icons/symbols/symbols-temp/nav/02-github';
+import { SvgSymbolHardDrive, SymbolHardDrive } from '../ui/icons/symbols/symbols-temp/nav/03-hdd';
 
 export * from '../ui/icons/symbols/all-other/06-folder';
 export * from '../ui/icons/symbols/all-other/08-dot';
@@ -56,6 +65,15 @@ export * from '../ui/icons/symbols/app/4-app-web-ie';
 export * from '../ui/icons/symbols/app/5-app-web-ie-text';
 export * from '../ui/icons/symbols/app/6-app-web-ie-dot';
 export * from '../ui/icons/symbols/app/7-app-manual-mode';
+// export * from '../ui/icons/symbols/symbols-temp/01-manual-mode';
+export * from '../ui/icons/symbols/symbols-temp/02-stitches';
+export * from '../ui/icons/symbols/symbols-temp/03-react-spring';
+// export * from '../ui/icons/symbols/symbols-temp/apps/01-manual-mode';
+// export * from '../ui/icons/symbols/symbols-temp/apps/02-stitches';
+// export * from '../ui/icons/symbols/symbols-temp/apps/03-react-spring';
+export * from '../ui/icons/symbols/symbols-temp/nav/01-tv';
+export * from '../ui/icons/symbols/symbols-temp/nav/02-github';
+export * from '../ui/icons/symbols/symbols-temp/nav/03-hdd';
 
 export type CollectedIconType = {
     component: (props: React.SVGAttributes<SVGSVGElement> & React.HTMLAttributes<SVGSVGElement>) => React.JSX.Element;
@@ -67,60 +85,71 @@ export type CollectedIconType = {
 // Common path: ../ui/icons/symbols
 
 export const collectedIconComponents: CollectedIconType[] = [
-    { component: SvgSymbolFolder,            name: 'SvgSymbolFolder',             folder: 'all-other',  sub: '06-folder' },
-    { component: SymbolFolder,               name: 'SymbolFolder',                folder: 'all-other',  sub: '06-folder' },
-    { component: SvgSymbolDot,               name: 'SvgSymbolDot',                folder: 'all-other',  sub: '08-dot' },
-    { component: SymbolDot,                  name: 'SymbolDot',                   folder: 'all-other',  sub: '08-dot' },
-    { component: SvgSymbolOpenLink,          name: 'SvgSymbolOpenLink',           folder: 'all-other',  sub: '09-open-link' },
-    { component: SymbolOpenLink,             name: 'SymbolOpenLink',              folder: 'all-other',  sub: '09-open-link' },
-    { component: SvgSymbolCross,             name: 'SvgSymbolCross',              folder: 'all-other',  sub: '13-cross' },
-    { component: SymbolCross,                name: 'SymbolCross',                 folder: 'all-other',  sub: '13-cross' },
-    { component: SvgSymbolPen,               name: 'SvgSymbolPen',                folder: 'all-other',  sub: '14-pen' },
-    { component: SymbolPen,                  name: 'SymbolPen',                   folder: 'all-other',  sub: '14-pen' },
-    { component: SvgSymbolFormLogin,         name: 'SvgSymbolFormLogin',          folder: 'all-other',  sub: '15-form-login' },
-    { component: SymbolFormLogin,            name: 'SymbolFormLogin',             folder: 'all-other',  sub: '15-form-login' },
-    { component: SvgSymbolFormChange,        name: 'SvgSymbolFormChange',         folder: 'all-other',  sub: '16-form-change' },
-    { component: SymbolFormChange,           name: 'SymbolFormChange',            folder: 'all-other',  sub: '16-form-change' },
-    { component: SvgSymbolClassicCheck,      name: 'SvgSymbolClassicCheck',       folder: 'all-other',  sub: '17-checkbox-classic' },
-    { component: SymbolCheckbox,             name: 'SymbolCheckbox',              folder: 'all-other',  sub: '17-checkbox-classic' },
-    { component: SvgSymbolClassicCheckEmpty, name: 'SvgSymbolClassicCheckEmpty',  folder: 'all-other',  sub: '18-checkbox-classic-empty' },
-    { component: SymbolCheckboxEmpty,        name: 'SymbolCheckboxEmpty',         folder: 'all-other',  sub: '18-checkbox-classic-empty' },
-    { component: SvgSymbolChevronDown,       name: 'SvgSymbolChevronDown',        folder: 'all-other',  sub: '20-chevron-down' },
-    { component: SymbolChevronDown,          name: 'SymbolChevronDown',           folder: 'all-other',  sub: '20-chevron-down' },
-    { component: SvgSymbolChevronUp,         name: 'SvgSymbolChevronUp',          folder: 'all-other',  sub: '21-chevron-up' },
-    { component: SymbolChevronUp,            name: 'SymbolChevronUp',             folder: 'all-other',  sub: '21-chevron-up' },
-    { component: SvgSymbolChevronDoubleDown, name: 'SvgSymbolChevronDoubleDown',  folder: 'all-other',  sub: '22-chevron-double-down' },
-    { component: SymbolDoubleDown,           name: 'SymbolDoubleDown',            folder: 'all-other',  sub: '22-chevron-double-down' },
-    { component: SvgSymbolChevronRight,      name: 'SvgSymbolChevronRight',       folder: 'all-other',  sub: '23-chevron-right' },
-    { component: SymbolChevronRight,         name: 'SymbolChevronRight',          folder: 'all-other',  sub: '23-chevron-right' },
-    { component: SvgSymbolFire,              name: 'SvgSymbolFire',               folder: 'all-other',  sub: '24-fire' },
-    { component: SymbolFire,                 name: 'SymbolFire',                  folder: 'all-other',  sub: '24-fire' },
-    { component: SvgSymbolInfo,              name: 'SvgSymbolInfo',               folder: 'all-other',  sub: '24-info' },
-    { component: SymbolInfo,                 name: 'SymbolInfo',                  folder: 'all-other',  sub: '24-info' },
-    { component: SvgSymbolQuestion,          name: 'SvgSymbolQuestion',           folder: 'all-other',  sub: '24-question' },
-    { component: SymbolQuestion,             name: 'SymbolQuestion',              folder: 'all-other',  sub: '24-question' },
-    { component: SvgSymbolWarning,           name: 'SvgSymbolWarning',            folder: 'all-other',  sub: '24-warning' },
-    { component: SymbolWarning,              name: 'SymbolWarning',               folder: 'all-other',  sub: '24-warning' },
-    { component: SvgSymbolCode,              name: 'SvgSymbolCode',               folder: 'all-other',  sub: '25-code' },
-    { component: SymbolCode,                 name: 'SymbolCode',                  folder: 'all-other',  sub: '25-code' },
-    { component: SvgSymbolForms,             name: 'SvgSymbolForms',              folder: 'all-other',  sub: '25-forms' },
-    { component: SymbolForms,                name: 'SymbolForms',                 folder: 'all-other',  sub: '25-forms' },
-    { component: SvgSymbolEllipsis,          name: 'SvgSymbolEllipsis',           folder: 'all-other',  sub: '26-ellipsis' },
-    { component: SymbolEllipsis,             name: 'SymbolEllipsis',              folder: 'all-other',  sub: '26-ellipsis' },
-    { component: SvgSymbolAppWebChrome,      name: 'SvgSymbolAppWebChrome',       folder: 'app',        sub: '1-app-web-chrome' },
-    { component: SymbolAppWebChrome,         name: 'SymbolAppWebChrome',          folder: 'app',        sub: '1-app-web-chrome' },
-    { component: SvgSymbolAppWin,            name: 'SvgSymbolAppWin',             folder: 'app',        sub: '2-app-win' },
-    { component: SymbolAppWin,               name: 'SymbolAppWin',                folder: 'app',        sub: '2-app-win' },
-    { component: SvgSymbolCatalog,           name: 'SvgSymbolCatalog',            folder: 'app',        sub: '3-app-fcat' },
-    { component: SymbolCatalog,              name: 'SymbolCatalog',               folder: 'app',        sub: '3-app-fcat' },
-    { component: SvgSymbolAppWebIe,          name: 'SvgSymbolAppWebIe',           folder: 'app',        sub: '4-app-web-ie' },
-    { component: SymbolAppWebIe,             name: 'SymbolAppWebIe',              folder: 'app',        sub: '4-app-web-ie' },
-    { component: SvgSymbolAppWebIeText,      name: 'SvgSymbolAppWebIeText',       folder: 'app',        sub: '5-app-web-ie-text' },
-    { component: SymbolAppWebIeText,         name: 'SymbolAppWebIeText',          folder: 'app',        sub: '5-app-web-ie-text' },
-    { component: SvgSymbolAppWebIeDot,       name: 'SvgSymbolAppWebIeDot',        folder: 'app',        sub: '6-app-web-ie-dot' },
-    { component: SymbolAppWebIeDot,          name: 'SymbolAppWebIeDot',           folder: 'app',        sub: '6-app-web-ie-dot' },
-    { component: SvgSymbolIconManualMode,    name: 'SvgSymbolIconManualMode',     folder: 'app',        sub: '7-app-manual-mode' },
-    { component: SymbolManualMode,           name: 'SymbolManualMode',            folder: 'app',        sub: '7-app-manual-mode' },
+    { component: SvgSymbolFolder,            name: 'SvgSymbolFolder',             folder: 'all-other',         sub: '06-folder' },
+    { component: SymbolFolder,               name: 'SymbolFolder',                folder: 'all-other',         sub: '06-folder' },
+    { component: SvgSymbolDot,               name: 'SvgSymbolDot',                folder: 'all-other',         sub: '08-dot' },
+    { component: SymbolDot,                  name: 'SymbolDot',                   folder: 'all-other',         sub: '08-dot' },
+    { component: SvgSymbolOpenLink,          name: 'SvgSymbolOpenLink',           folder: 'all-other',         sub: '09-open-link' },
+    { component: SymbolOpenLink,             name: 'SymbolOpenLink',              folder: 'all-other',         sub: '09-open-link' },
+    { component: SvgSymbolCross,             name: 'SvgSymbolCross',              folder: 'all-other',         sub: '13-cross' },
+    { component: SymbolCross,                name: 'SymbolCross',                 folder: 'all-other',         sub: '13-cross' },
+    { component: SvgSymbolPen,               name: 'SvgSymbolPen',                folder: 'all-other',         sub: '14-pen' },
+    { component: SymbolPen,                  name: 'SymbolPen',                   folder: 'all-other',         sub: '14-pen' },
+    { component: SvgSymbolFormLogin,         name: 'SvgSymbolFormLogin',          folder: 'all-other',         sub: '15-form-login' },
+    { component: SymbolFormLogin,            name: 'SymbolFormLogin',             folder: 'all-other',         sub: '15-form-login' },
+    { component: SvgSymbolFormChange,        name: 'SvgSymbolFormChange',         folder: 'all-other',         sub: '16-form-change' },
+    { component: SymbolFormChange,           name: 'SymbolFormChange',            folder: 'all-other',         sub: '16-form-change' },
+    { component: SvgSymbolClassicCheck,      name: 'SvgSymbolClassicCheck',       folder: 'all-other',         sub: '17-checkbox-classic' },
+    { component: SymbolCheckbox,             name: 'SymbolCheckbox',              folder: 'all-other',         sub: '17-checkbox-classic' },
+    { component: SvgSymbolClassicCheckEmpty, name: 'SvgSymbolClassicCheckEmpty',  folder: 'all-other',         sub: '18-checkbox-classic-empty' },
+    { component: SymbolCheckboxEmpty,        name: 'SymbolCheckboxEmpty',         folder: 'all-other',         sub: '18-checkbox-classic-empty' },
+    { component: SvgSymbolChevronDown,       name: 'SvgSymbolChevronDown',        folder: 'all-other',         sub: '20-chevron-down' },
+    { component: SymbolChevronDown,          name: 'SymbolChevronDown',           folder: 'all-other',         sub: '20-chevron-down' },
+    { component: SvgSymbolChevronUp,         name: 'SvgSymbolChevronUp',          folder: 'all-other',         sub: '21-chevron-up' },
+    { component: SymbolChevronUp,            name: 'SymbolChevronUp',             folder: 'all-other',         sub: '21-chevron-up' },
+    { component: SvgSymbolChevronDoubleDown, name: 'SvgSymbolChevronDoubleDown',  folder: 'all-other',         sub: '22-chevron-double-down' },
+    { component: SymbolDoubleDown,           name: 'SymbolDoubleDown',            folder: 'all-other',         sub: '22-chevron-double-down' },
+    { component: SvgSymbolChevronRight,      name: 'SvgSymbolChevronRight',       folder: 'all-other',         sub: '23-chevron-right' },
+    { component: SymbolChevronRight,         name: 'SymbolChevronRight',          folder: 'all-other',         sub: '23-chevron-right' },
+    { component: SvgSymbolFire,              name: 'SvgSymbolFire',               folder: 'all-other',         sub: '24-fire' },
+    { component: SymbolFire,                 name: 'SymbolFire',                  folder: 'all-other',         sub: '24-fire' },
+    { component: SvgSymbolInfo,              name: 'SvgSymbolInfo',               folder: 'all-other',         sub: '24-info' },
+    { component: SymbolInfo,                 name: 'SymbolInfo',                  folder: 'all-other',         sub: '24-info' },
+    { component: SvgSymbolQuestion,          name: 'SvgSymbolQuestion',           folder: 'all-other',         sub: '24-question' },
+    { component: SymbolQuestion,             name: 'SymbolQuestion',              folder: 'all-other',         sub: '24-question' },
+    { component: SvgSymbolWarning,           name: 'SvgSymbolWarning',            folder: 'all-other',         sub: '24-warning' },
+    { component: SymbolWarning,              name: 'SymbolWarning',               folder: 'all-other',         sub: '24-warning' },
+    { component: SvgSymbolCode,              name: 'SvgSymbolCode',               folder: 'all-other',         sub: '25-code' },
+    { component: SymbolCode,                 name: 'SymbolCode',                  folder: 'all-other',         sub: '25-code' },
+    { component: SvgSymbolForms,             name: 'SvgSymbolForms',              folder: 'all-other',         sub: '25-forms' },
+    { component: SymbolForms,                name: 'SymbolForms',                 folder: 'all-other',         sub: '25-forms' },
+    { component: SvgSymbolEllipsis,          name: 'SvgSymbolEllipsis',           folder: 'all-other',         sub: '26-ellipsis' },
+    { component: SymbolEllipsis,             name: 'SymbolEllipsis',              folder: 'all-other',         sub: '26-ellipsis' },
+    { component: SvgSymbolAppWebChrome,      name: 'SvgSymbolAppWebChrome',       folder: 'app',               sub: '1-app-web-chrome' },
+    { component: SymbolAppWebChrome,         name: 'SymbolAppWebChrome',          folder: 'app',               sub: '1-app-web-chrome' },
+    { component: SvgSymbolAppWin,            name: 'SvgSymbolAppWin',             folder: 'app',               sub: '2-app-win' },
+    { component: SymbolAppWin,               name: 'SymbolAppWin',                folder: 'app',               sub: '2-app-win' },
+    { component: SvgSymbolCatalog,           name: 'SvgSymbolCatalog',            folder: 'app',               sub: '3-app-fcat' },
+    { component: SymbolCatalog,              name: 'SymbolCatalog',               folder: 'app',               sub: '3-app-fcat' },
+    { component: SvgSymbolAppWebIe,          name: 'SvgSymbolAppWebIe',           folder: 'app',               sub: '4-app-web-ie' },
+    { component: SymbolAppWebIe,             name: 'SymbolAppWebIe',              folder: 'app',               sub: '4-app-web-ie' },
+    { component: SvgSymbolAppWebIeText,      name: 'SvgSymbolAppWebIeText',       folder: 'app',               sub: '5-app-web-ie-text' },
+    { component: SymbolAppWebIeText,         name: 'SymbolAppWebIeText',          folder: 'app',               sub: '5-app-web-ie-text' },
+    { component: SvgSymbolAppWebIeDot,       name: 'SvgSymbolAppWebIeDot',        folder: 'app',               sub: '6-app-web-ie-dot' },
+    { component: SymbolAppWebIeDot,          name: 'SymbolAppWebIeDot',           folder: 'app',               sub: '6-app-web-ie-dot' },
+    { component: SvgSymbolIconManualMode,    name: 'SvgSymbolIconManualMode',     folder: 'app',               sub: '7-app-manual-mode' },
+    // { component: SymbolManualMode,           name: 'SymbolManualMode',            folder: 'app',               sub: '7-app-manual-mode' },
+    // { component: SvgSymbolManualMode,        name: 'SvgSymbolManualMode',         folder: 'symbols-temp',      sub: '01-manual-mode' },
+    { component: SvgSymbolStitches,          name: 'SvgSymbolStitches',           folder: 'symbols-temp',      sub: '02-stitches' },
+    { component: SymbolStitches,             name: 'SymbolStitches',              folder: 'symbols-temp',      sub: '02-stitches' },
+    { component: SvgSymbolReactSpring,       name: 'SvgSymbolReactSpring',        folder: 'symbols-temp',      sub: '03-react-spring' },
+    { component: SymbolReactSpring,          name: 'SymbolReactSpring',           folder: 'symbols-temp',      sub: '03-react-spring' },
+    { component: SvgSymbolIconTv,            name: 'SvgSymbolIconTv',             folder: 'symbols-temp/nav',  sub: '01-tv' },
+    { component: SymbolTv,                   name: 'SymbolTv',                    folder: 'symbols-temp/nav',  sub: '01-tv' },
+    { component: SvgSymbolGithubLogo,        name: 'SvgSymbolGithubLogo',         folder: 'symbols-temp/nav',  sub: '02-github' },
+    { component: SymbolGithubLogo,           name: 'SymbolGithubLogo',            folder: 'symbols-temp/nav',  sub: '02-github' },
+    { component: SvgSymbolHardDrive,         name: 'SvgSymbolHardDrive',          folder: 'symbols-temp/nav',  sub: '03-hdd' },
+    { component: SymbolHardDrive,            name: 'SymbolHardDrive',             folder: 'symbols-temp/nav',  sub: '03-hdd' },
 ];
 
 export function DefAppTypes() {
@@ -152,6 +181,15 @@ export function DefAppTypes() {
         {/*app*/ SvgSymbolAppWebIeText()}
         {/*app*/ SvgSymbolAppWebIeDot()}
         {/*app*/ SvgSymbolIconManualMode()}
+        {/*symbols-temp* / SvgSymbolManualMode()*/}
+        {/*symbols-temp*/ SvgSymbolStitches()}
+        {/*symbols-temp*/ SvgSymbolReactSpring()}
+        {/*symbols-temp/apps* / SvgSymbolManualMode()*/}
+        {/*symbols-temp/apps*/ SvgSymbolStitches()}
+        {/*symbols-temp/apps*/ SvgSymbolReactSpring()}
+        {/*symbols-temp/nav*/ SvgSymbolIconTv()}
+        {/*symbols-temp/nav*/ SvgSymbolGithubLogo()}
+        {/*symbols-temp/nav*/ SvgSymbolHardDrive()}
     </>);
 }
 
