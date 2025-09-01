@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 test-results
-!test-results/collected-test.ts
+!test-results/collected-data.ts

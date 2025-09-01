@@ -1,4 +1,4 @@
-import { collectedIconComponents } from './collected-test';
+import { collectedIconComponents } from './collected-data';
 
 export function SectionMain() {
     return (
@@ -29,13 +29,15 @@ export function SectionMain() {
 const filtered = Object.values(collectedIconComponents).filter(c => c.name.startsWith('Symbol'));
 const groups = groupByFolder(filtered);
 
-// group by folder (use 'root' when folder is missing); include sub-folder if present
 function groupByFolder(items: Array<any>) {
-    return items.reduce<Record<string, typeof items[number][]>>((acc, item) => {
-        const folder = item.folder || 'root';
-        const sub = item.sub ? `/${item.sub}` : '';
-        const key = `${folder}${sub}`;
-        (acc[key] ||= []).push(item);
-        return acc;
-    }, {});
+    // group by folder (use 'root' when folder is missing); include sub-folder if present
+    return items.reduce<Record<string, typeof items[number][]>>(
+        (acc, item) => {
+            const folder = item.folder || 'root';
+            const sub = item.sub ? `/${item.sub}` : '';
+            const key = `${folder}${sub}`;
+            (acc[key] ||= []).push(item);
+            return acc;
+        }, {}
+    );
 }

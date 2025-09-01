@@ -10,8 +10,8 @@ import { extractNamesFromFile } from './extract-names-alternative';
 export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ names: string[]; dest: string; }> {
     const logger = createLogger(!!opts.verbose);
 
-    const srcDir = opts.srcDir || 'packages/app/src/components/ui/icons/symbols/all-other';
-    const outFile = opts.outFile || 'packages/collect-icons/generated/collected-icons.ts';
+    const srcDir = opts.srcDir || 'packages/app/src/components/ui/icons/symbols';
+    const outFile = opts.outFile || 'packages/tester/test-results/collected-data.ts';
 
     const base = path.isAbsolute(srcDir) ? srcDir : path.resolve(process.cwd(), srcDir);
     const recursive = opts.recursive !== undefined ? !!opts.recursive : true;
@@ -68,11 +68,11 @@ export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ na
                 }
             } else {
                 const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
-                importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
+                importPath = relImportPath.startsWith('.') ? relImportPath : `./${relImportPath}`;
             }
         } else {
             const relImportPath = path.relative(destDir, file).replace(/\\+/g, '/').replace(/\.(tsx|ts|jsx|js|svg)$/, '');
-            importPath = relImportPath.startsWith('.') ? relImportPath : './' + relImportPath;
+            importPath = relImportPath.startsWith('.') ? relImportPath : `./${relImportPath}`;
         }
         groups[importPath] = groups[importPath] || [];
         groups[importPath].push(...names);
