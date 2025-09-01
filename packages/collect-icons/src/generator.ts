@@ -12,10 +12,17 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     const lines: string[] = [];
     lines.push(...generateFileHeader());
 
-    // 1. imports
+    // 1.1. imports
     for (const [importPath, componentNames] of Object.entries(groups)) {
         const unique = Array.from(new Set(componentNames)).sort();
         unique.length && lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
+    }
+    lines.push('');
+
+    // 1.2. exports
+    for (const [importPath, componentNames] of Object.entries(groups)) {
+        const unique = Array.from(new Set(componentNames)).sort();
+        unique.length && lines.push(`export * from '${importPath}';`);
     }
     lines.push('');
 
