@@ -32,6 +32,8 @@ export async function generateCollectedFile({ groups, allNames }: { groups: Reco
     // lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
     // lines.push('export type CollectedIconType = typeof collectedIconNames[number];');
 
+    generateHelperGroupByFolder(lines);
+
     const rv = lines.join('\n');
     return rv;
 }
@@ -56,8 +58,12 @@ function generateExports(lines: string[], groups: Record<string, string[]>): voi
 
 function generateSingleExport(lines: string[], commonPath: string, uniqueNames: string[], nameToImport: Map<string, string>, groups: Record<string, string[]>): void {
     if (uniqueNames.length > 0) {
+        //lines.push(`export type CollectedIconType = typeof collectedIconComponents[number];\n`);
+        lines.push(`export type CollectedIconType = {\n    component: (props: React.SVGAttributes<SVGSVGElement> & React.HTMLAttributes<SVGSVGElement>) => React.JSX.Element;\n    name: string;\n    folder: string;\n    sub: string;\n}\n`);
+
         lines.push(`// Common path: ${commonPath}\n`);
-        lines.push('export const collectedIconComponents = [');
+
+        lines.push('export const collectedIconComponents: CollectedIconType[] = [');
 
         const maxNameLen = maxLength(uniqueNames) + 1; // // compute max name length so comments can be aligned; +1 for comma after the name
 
@@ -119,6 +125,21 @@ function generateDefTypes(lines: string[], commonPath: string, groups: Record<st
     }
 
     lines.push(`    </>);`);
+    lines.push(`}`);
+    lines.push('');
+}
+
+function generateHelperGroupByFolder(lines: string[]): void {
+    lines.push(`export function groupByFolder<T extends { folder?: string; sub?: string; }>(items: T[]): Record<string, T[]> { // folderRoot -> CollectedIconType[]`);
+    lines.push(`    return items.reduce<Record<string, typeof items[number][]>>(`);
+    lines.push(`        (acc, item) => {`);
+    lines.push(`            const folderRoot = item.folder || 'root';`);
+    lines.push(`            const folderComponent = item.sub ? \`/\${item.sub}\` : '';`);
+    lines.push(`            const key = \`\${folderRoot}\${folderComponent}\`;`);
+    lines.push(`            (acc[key] ||= []).push(item);`);
+    lines.push(`            return acc;`);
+    lines.push(`        }, {}`);
+    lines.push(`    );`);
     lines.push(`}`);
     lines.push('');
 }

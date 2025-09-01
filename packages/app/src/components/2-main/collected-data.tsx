@@ -57,9 +57,16 @@ export * from '../ui/icons/symbols/app/5-app-web-ie-text';
 export * from '../ui/icons/symbols/app/6-app-web-ie-dot';
 export * from '../ui/icons/symbols/app/7-app-manual-mode';
 
+export type CollectedIconType = {
+    component: (props: React.SVGAttributes<SVGSVGElement> & React.HTMLAttributes<SVGSVGElement>) => React.JSX.Element;
+    name: string;
+    folder: string;
+    sub: string;
+}
+
 // Common path: ../ui/icons/symbols
 
-export const collectedIconComponents = [
+export const collectedIconComponents: CollectedIconType[] = [
     { component: SvgSymbolFolder,            name: 'SvgSymbolFolder',             folder: 'all-other',  sub: '06-folder' },
     { component: SymbolFolder,               name: 'SymbolFolder',                folder: 'all-other',  sub: '06-folder' },
     { component: SvgSymbolDot,               name: 'SvgSymbolDot',                folder: 'all-other',  sub: '08-dot' },
@@ -146,4 +153,16 @@ export function DefAppTypes() {
         {/*app*/ SvgSymbolAppWebIeDot()}
         {/*app*/ SvgSymbolIconManualMode()}
     </>);
+}
+
+export function groupByFolder<T extends { folder?: string; sub?: string; }>(items: T[]): Record<string, T[]> { // folderRoot -> CollectedIconType[]
+    return items.reduce<Record<string, typeof items[number][]>>(
+        (acc, item) => {
+            const folderRoot = item.folder || 'root';
+            const folderComponent = item.sub ? `/${item.sub}` : '';
+            const key = `${folderRoot}${folderComponent}`;
+            (acc[key] ||= []).push(item);
+            return acc;
+        }, {}
+    );
 }
