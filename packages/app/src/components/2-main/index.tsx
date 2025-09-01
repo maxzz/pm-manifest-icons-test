@@ -10,7 +10,7 @@ export function SectionMain() {
                     const IconComponent = Icon.component;
                     return (
                         <div key={Icon.name}>
-                            <IconComponent className="size-6" />
+                            <IconComponent className="size-6" title={Icon.name} />
                         </div>
                     );
                 }
