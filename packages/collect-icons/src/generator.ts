@@ -35,7 +35,7 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
 
         lines.push('export const collectedIconComponents = [');
         // compute max name length so comments can be aligned
-        const maxNameLen = maxLength(uniqueNames) + 4; // 4 for the space after the name and comma
+        const maxNameLen = maxLength(uniqueNames) + 1; // 1 for the space after the name and comma
 
         const step1: Array<[string, string] | string> = [];
 
@@ -49,8 +49,8 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
                 const parts = short.split('/');
                 const folderComponent = parts.pop();
                 const folderRoot = parts.join('/');
-                const firstTwo = `    { component: ${componentName},${padding} group: '${folderRoot}', `
-                const last = `name: '${folderComponent}' },`;
+                const firstTwo = `    { component: ${componentName},${padding} folder: '${folderRoot}', `
+                const last = `subfolder: '${folderComponent}' },`;
                 step1.push([firstTwo, last]);
             } else {
                 step1.push(`    ${componentName},`);
@@ -66,23 +66,6 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
                 lines.push(`${line[0]}${' '.repeat(maxLenOfStep1 - line[0].length)} ${line[1]}`);
             }
         }
-
-        // for (const componentName of uniqueNames) {
-        //     const from = nameToImport.get(componentName);
-        //     if (from) {
-        //         const padding = ' '.repeat(Math.max(1, maxNameLen - componentName.length)); // name, then padding so all comments line up vertically
-        //         // lines.push(`    ${componentName},${padding}// from '${from}'`);
-
-        //         const short = from.replace(commonPath, '').replace(/^\//, '');
-        //         const parts = short.split('/');
-        //         const folderComponent = parts.pop();
-        //         const folderRoot = parts.join('/');
-        //         const firstTwo = `    { component: ${componentName},${padding} group: '${folderRoot}'`
-        //         lines.push(`    { component: ${componentName},${padding} group: '${folderRoot}', name: '${folderComponent}' },`);
-        //     } else {
-        //         lines.push(`    ${componentName},`);
-        //     }
-        // }
 
         lines.push('];');
         lines.push('');
