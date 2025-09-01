@@ -29,7 +29,7 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     }
 
     if (uniqueNames.length > 0) {
-        const commonPath = findCommonPathInUniqueNames(uniqueNames);
+        const commonPath = findCommonPathInUniqueNames(Object.keys(groups));
 
         lines.push('export const collectedIconComponents = [');
         // compute max name length so comments can be aligned
@@ -41,7 +41,7 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
                 const padding = ' '.repeat(Math.max(1, maxNameLen - componentName.length)); // name, then padding so all comments line up vertically
                 // lines.push(`    ${componentName},${padding}// from '${from}'`);
 
-                const short = from.replace(commonPath, '');
+                const short = from.replace(commonPath, '').replace(/^\//, '');
                 lines.push(`    { component: ${componentName},${padding} path: '${short}' },`);
             } else {
                 lines.push(`    ${componentName},`);
