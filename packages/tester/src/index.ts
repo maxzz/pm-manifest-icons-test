@@ -7,7 +7,7 @@ import { collectIcons } from '../../../packages/collect-icons/src/index';
 async function main() {
     const { names, dest } = await collectIcons({
         srcDir: path.resolve(process.cwd(), '../../packages/app/src/components/ui/icons/symbols'),
-        outFile: path.resolve(process.cwd(), 'test-results/collected-data.ts'),
+        outFile: path.resolve(process.cwd(), 'test-results/collected-data.tsx'),
         verbose: false,
         //exportFolderName: 'app',
         bareImportsMode: 'bare',

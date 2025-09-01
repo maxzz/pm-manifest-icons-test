@@ -11,7 +11,7 @@ export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ na
     const logger = createLogger(!!opts.verbose);
 
     const srcDir = opts.srcDir || 'packages/app/src/components/ui/icons/symbols';
-    const outFile = opts.outFile || 'packages/tester/test-results/collected-data.ts';
+    const outFile = opts.outFile || 'packages/tester/test-results/collected-data.tsx';
 
     const base = path.isAbsolute(srcDir) ? srcDir : path.resolve(process.cwd(), srcDir);
     const recursive = opts.recursive !== undefined ? !!opts.recursive : true;
