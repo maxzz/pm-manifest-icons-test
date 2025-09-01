@@ -50,7 +50,7 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
                 const folderComponent = parts.pop();
                 const folderRoot = parts.join('/');
                 const firstTwo = `    { component: ${componentName},${padding}name: '${componentName}',${padding} folder: '${folderRoot}', `
-                const last = `subfolder: '${folderComponent}' },`;
+                const last = `sub: '${folderComponent}' },`; //sub-folder
                 step1.push([firstTwo, last]);
             } else {
                 step1.push(`    ${componentName},`);
@@ -74,8 +74,8 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     }
 
     // 2. names array and type
-    lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
-    lines.push('export type CollectedIconType = typeof collectedIconNames[number];');
+    // lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
+    // lines.push('export type CollectedIconType = typeof collectedIconNames[number];');
 
     const rv = lines.join('\n');
     return rv;
