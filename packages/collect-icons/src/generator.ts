@@ -28,27 +28,7 @@ function nameToImportMap(groups: Record<string, string[]>): Map<string, string> 
     return rv;
 }
 
-/**
- * Generate the collected icons TypeScript file and write it to disk.
- *
- * @param groups - Mapping of import path -> exported symbol names. Example: { 'app/components/ui/icon': ['SvgSymbolFoo','SymbolFoo'] }
- * @param uniqueNames - Deduplicated, sorted list of all collected names. Example: ['SvgSymbolFoo','SymbolFoo']
- *
- * @returns Promise resolving to an object { dest, names } where `names` is the list of collected names.
- */
-export async function generateCollectedFile({ groups, uniqueNames }: { groups: Record<string, string[]>; uniqueNames: string[]; }): Promise<string> {
-    const lines: string[] = [];
-    lines.push(...generateFileHeader());
-
-    // 1.1. imports
-    generateImports(lines, groups);
-
-    // 1.2. exports
-    generateExports(lines, groups);
-
-    // 2. export a single object containing all collected components
-    const nameToImport = nameToImportMap(groups);
-
+function generateSingleExport(lines: string[], uniqueNames: string[], nameToImport: Map<string, string>, groups: Record<string, string[]>): void {
     if (uniqueNames.length > 0) {
         const commonPath = findCommonPathInUniqueNames(Object.keys(groups));
 
@@ -91,6 +71,30 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     } else {
         lines.push('export const collectedIconComponents = {};\n');
     }
+}
+
+/**
+ * Generate the collected icons TypeScript file and write it to disk.
+ *
+ * @param groups - Mapping of import path -> exported symbol names. Example: { 'app/components/ui/icon': ['SvgSymbolFoo','SymbolFoo'] }
+ * @param uniqueNames - Deduplicated, sorted list of all collected names. Example: ['SvgSymbolFoo','SymbolFoo']
+ *
+ * @returns Promise resolving to an object { dest, names } where `names` is the list of collected names.
+ */
+export async function generateCollectedFile({ groups, uniqueNames }: { groups: Record<string, string[]>; uniqueNames: string[]; }): Promise<string> {
+    const lines: string[] = [];
+    lines.push(...generateFileHeader());
+
+    // 1.1. imports
+    generateImports(lines, groups);
+
+    // 1.2. exports
+    generateExports(lines, groups);
+
+    // 2. export a single object containing all collected components
+    const nameToImport = nameToImportMap(groups);
+
+    generateSingleExport(lines, uniqueNames, nameToImport, groups);
 
     /*
     generate:
