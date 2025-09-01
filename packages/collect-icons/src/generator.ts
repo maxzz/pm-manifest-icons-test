@@ -49,7 +49,7 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
                 const parts = short.split('/');
                 const folderComponent = parts.pop();
                 const folderRoot = parts.join('/');
-                const firstTwo = `    { component: ${componentName},${padding} folder: '${folderRoot}', `
+                const firstTwo = `    { component: ${componentName},${padding}name: '${componentName}',${padding} folder: '${folderRoot}', `
                 const last = `subfolder: '${folderComponent}' },`;
                 step1.push([firstTwo, last]);
             } else {
