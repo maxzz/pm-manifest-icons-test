@@ -134,9 +134,7 @@ function generateHelperGroupByFolder(lines: string[]): void {
     lines.push(`    return items.reduce<Record<string, typeof items[number][]>>(`);
     lines.push(`        (acc, item) => {`);
     lines.push(`            const folderRoot = item.folder || 'root';`);
-    lines.push(`            const folderComponent = item.sub ? \`/\${item.sub}\` : '';`);
-    lines.push(`            const key = \`\${folderRoot}\${folderComponent}\`;`);
-    lines.push(`            (acc[key] ||= []).push(item);`);
+    lines.push(`            (acc[folderRoot] ||= []).push(item);`);
     lines.push(`            return acc;`);
     lines.push(`        }, {}`);
     lines.push(`    );`);

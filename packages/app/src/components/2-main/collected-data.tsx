@@ -159,9 +159,7 @@ export function groupByFolder<T extends { folder?: string; sub?: string; }>(item
     return items.reduce<Record<string, typeof items[number][]>>(
         (acc, item) => {
             const folderRoot = item.folder || 'root';
-            const folderComponent = item.sub ? `/${item.sub}` : '';
-            const key = `${folderRoot}${folderComponent}`;
-            (acc[key] ||= []).push(item);
+            (acc[folderRoot] ||= []).push(item);
             return acc;
         }, {}
     );
