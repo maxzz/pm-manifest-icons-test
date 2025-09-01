@@ -1,4 +1,32 @@
-import { c } from "vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf";
+function generateImports(lines: string[], groups: Record<string, string[]>): void {
+    // 1.1. imports
+    for (const [importPath, componentNames] of Object.entries(groups)) {
+        const unique = Array.from(new Set(componentNames)).sort();
+        unique.length && lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
+    }
+    lines.push('');
+}
+
+function generateExports(lines: string[], groups: Record<string, string[]>): void {
+    // 1.2. exports
+    for (const [importPath, componentNames] of Object.entries(groups)) {
+        const unique = Array.from(new Set(componentNames)).sort();
+        unique.length && lines.push(`export * from '${importPath}';`);
+    }
+    lines.push('');
+}
+
+function nameToImportMap(groups: Record<string, string[]>): Map<string, string> {
+    const rv = new Map<string, string>();
+    for (const [importPath, componentNames] of Object.entries(groups)) {
+        for (const name of componentNames) {
+            if (!rv.has(name)) {
+                rv.set(name, importPath);
+            }
+        }
+    }
+    return rv;
+}
 
 /**
  * Generate the collected icons TypeScript file and write it to disk.
@@ -13,28 +41,13 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     lines.push(...generateFileHeader());
 
     // 1.1. imports
-    for (const [importPath, componentNames] of Object.entries(groups)) {
-        const unique = Array.from(new Set(componentNames)).sort();
-        unique.length && lines.push(`import { ${unique.join(', ')} } from '${importPath}';`);
-    }
-    lines.push('');
+    generateImports(lines, groups);
 
     // 1.2. exports
-    for (const [importPath, componentNames] of Object.entries(groups)) {
-        const unique = Array.from(new Set(componentNames)).sort();
-        unique.length && lines.push(`export * from '${importPath}';`);
-    }
-    lines.push('');
+    generateExports(lines, groups);
 
     // 2. export a single object containing all collected components
-    const nameToImport = new Map<string, string>();
-    for (const [importPath, componentNames] of Object.entries(groups)) {
-        for (const n of componentNames) {
-            if (!nameToImport.has(n)) {
-                nameToImport.set(n, importPath);
-            }
-        }
-    }
+    const nameToImport = nameToImportMap(groups);
 
     if (uniqueNames.length > 0) {
         const commonPath = findCommonPathInUniqueNames(Object.keys(groups));
@@ -55,7 +68,7 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
                 const parts = short.split('/');
                 const folderComponent = parts.pop();
                 const folderRoot = parts.join('/');
-                const firstTwo = `    { component: ${componentName},${padding}name: '${componentName}',${padding} folder: '${folderRoot}', `
+                const firstTwo = `    { component: ${componentName},${padding}name: '${componentName}',${padding} folder: '${folderRoot}', `;
                 const last = `sub: '${folderComponent}' },`; //sub-folder
                 step1.push([firstTwo, last]);
             } else {
