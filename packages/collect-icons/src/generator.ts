@@ -36,9 +36,12 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
         for (const componentName of uniqueNames) {
             const from = nameToImport.get(componentName);
             if (from) {
-                const padding = ' '.repeat(Math.max(1, maxNameLen - componentName.length));
-                // name, then padding so all comments line up vertically
-                lines.push(`    ${componentName},${padding}// from '${from}'`);
+                const padding = ' '.repeat(Math.max(1, maxNameLen - componentName.length)); // name, then padding so all comments line up vertically
+                // lines.push(`    ${componentName},${padding}// from '${from}'`);
+
+                const parts = from.split('/');
+                const lastTwoNamesFrom = parts.slice(-2).join('/'); // folder and component folder
+                lines.push(`    { ${componentName},${padding}, '${lastTwoNamesFrom}' },`);
             } else {
                 lines.push(`    ${componentName},`);
             }
