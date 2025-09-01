@@ -42,7 +42,10 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
                 // lines.push(`    ${componentName},${padding}// from '${from}'`);
 
                 const short = from.replace(commonPath, '').replace(/^\//, '');
-                lines.push(`    { component: ${componentName},${padding} path: '${short}' },`);
+                const parts = short.split('/');
+                const folderComponent = parts.pop();
+                const folderRoot = parts.join('/');
+                lines.push(`    { component: ${componentName},${padding} group: '${folderRoot}', name: '${folderComponent}' },`);
             } else {
                 lines.push(`    ${componentName},`);
             }
@@ -67,6 +70,10 @@ function generateFileHeader(): string[] {
         '/* eslint-disable */',
         ''
     ];
+}
+
+function maxLength(strings: string[]): number {
+    return strings.reduce((m, s) => Math.max(m, s.length), 0);
 }
 
 function findCommonPathInUniqueNames(uniqueNames: string[]): string {
