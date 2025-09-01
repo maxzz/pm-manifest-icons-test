@@ -8,6 +8,9 @@
  */
 export async function generateCollectedFile({ groups, uniqueNames }: { groups: Record<string, string[]>; uniqueNames: string[]; }): Promise<string> {
     const lines: string[] = [];
+    
+    const commonPath = findCommonPathInUniqueNames(Object.keys(groups));
+    
     generateFileHeader(lines);
 
     // 1.1. imports
@@ -19,10 +22,10 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     // 2. export a single object containing all collected components
     const nameToImport = nameToImportMap(groups);
 
-    generateSingleExport(lines, uniqueNames, nameToImport, groups);
+    generateSingleExport(lines, commonPath, uniqueNames, nameToImport, groups);
 
     // 2.2. export a single function DefAppTypes() that returns a fragment of JSX
-    generateDefTypes(lines, groups);
+    generateDefTypes(lines, commonPath, groups);
 
     // 2. names array and type
     // lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
@@ -50,7 +53,7 @@ function generateExports(lines: string[], groups: Record<string, string[]>): voi
     lines.push('');
 }
 
-function getFromParts(from: string, commonPath: string): { folderRoot: string; folderComponent: string; } {
+function fromFromGetFoldersRootAndSub(from: string, commonPath: string): { folderRoot: string; folderComponent: string; } {
     const short = from.replace(commonPath, '').replace(/^\//, '');
     const parts = short.split('/');
     const folderComponent = parts.pop() || '';
@@ -58,10 +61,8 @@ function getFromParts(from: string, commonPath: string): { folderRoot: string; f
     return { folderRoot, folderComponent };
 }
 
-function generateSingleExport(lines: string[], uniqueNames: string[], nameToImport: Map<string, string>, groups: Record<string, string[]>): void {
+function generateSingleExport(lines: string[], commonPath: string, uniqueNames: string[], nameToImport: Map<string, string>, groups: Record<string, string[]>): void {
     if (uniqueNames.length > 0) {
-        const commonPath = findCommonPathInUniqueNames(Object.keys(groups));
-
         lines.push(`// Common path: ${commonPath}\n`);
         lines.push('export const collectedIconComponents = [');
 
@@ -73,10 +74,9 @@ function generateSingleExport(lines: string[], uniqueNames: string[], nameToImpo
             const from = nameToImport.get(componentName);
             if (from) {
                 const padding = ' '.repeat(Math.max(1, maxNameLen - componentName.length)); // name, then padding so all comments line up vertically
-                
                 // lines.push(`    ${componentName},${padding}// from '${from}'`); // Annotate each entry with a comment showing where it was imported from (first occurrence)
 
-                const { folderRoot, folderComponent } = getFromParts(from, commonPath);
+                const { folderRoot, folderComponent } = fromFromGetFoldersRootAndSub(from, commonPath);
 
                 const firstTwo = `    { component: ${componentName},${padding}name: '${componentName}',${padding} folder: '${folderRoot}', `;
                 const last = `sub: '${folderComponent}' },`; // sub-folder
@@ -103,7 +103,7 @@ function generateSingleExport(lines: string[], uniqueNames: string[], nameToImpo
     }
 }
 
-function generateDefTypes(lines: string[], groups: Record<string, string[]>): void {
+function generateDefTypes(lines: string[], commonPath: string, groups: Record<string, string[]>): void {
     // Export a single function DefAppTypes() that returns a fragment of JSX
     /*
     generate:
@@ -117,10 +117,13 @@ function generateDefTypes(lines: string[], groups: Record<string, string[]>): vo
     */
     lines.push(`export function DefAppTypes() {`);
     lines.push(`    return (<>`);
+
     for (const [importPath, componentNames] of Object.entries(groups)) {
+        const { folderRoot, folderComponent } = fromFromGetFoldersRootAndSub(importPath, commonPath);
         const unique = Array.from(new Set(componentNames)).filter(n => n.startsWith('SvgSymbol')); //.sort();
-        unique.length && lines.push(`        ${unique.map(n => `{${n}()}`).join('\n        ')}`);
+        unique.length && lines.push(`        ${unique.map(n => `{/*${folderRoot}*/ ${n}()}`).join('\n        ')}`);
     }
+
     lines.push(`    </>);`);
     lines.push(`}`);
     lines.push('');
@@ -151,7 +154,9 @@ function maxLength(strings: string[]): number {
 }
 
 function findCommonPathInUniqueNames(uniqueNames: string[]): string {
-    if (!uniqueNames || uniqueNames.length === 0) return '';
+    if (!uniqueNames || uniqueNames.length === 0) {
+        return '';
+    }
 
     // normalize separators and split into parts
     const partsList = uniqueNames.map(p => p.replace(/\\/g, '/').split('/'));
