@@ -29,7 +29,9 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     }
 
     if (uniqueNames.length > 0) {
-        lines.push('export const collectedIconComponents = {');
+        console.log(`---- ${findCommonPathInUniqueNames(Object.keys(groups))}`);
+
+        lines.push('export const collectedIconComponents = [');
         // compute max name length so comments can be aligned
         const maxNameLen = uniqueNames.reduce((m, s) => Math.max(m, s.length), 0) + 4; // 4 for the space after the name and comma
 
@@ -41,12 +43,12 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
 
                 const parts = from.split('/');
                 const lastTwoNamesFrom = parts.slice(-2).join('/'); // folder and component folder
-                lines.push(`    { ${componentName},${padding}, '${lastTwoNamesFrom}' },`);
+                lines.push(`    { component: ${componentName},${padding} path: '${lastTwoNamesFrom}' },`);
             } else {
                 lines.push(`    ${componentName},`);
             }
         }
-        lines.push('};');
+        lines.push('];');
         lines.push('');
     } else {
         lines.push('export const collectedIconComponents = {};\n');
@@ -66,6 +68,26 @@ function generateFileHeader(): string[] {
         '/* eslint-disable */',
         ''
     ];
+}
+
+function findCommonPathInUniqueNames(uniqueNames: string[]): string {
+    if (!uniqueNames || uniqueNames.length === 0) return '';
+
+    // normalize separators and split into parts
+    const partsList = uniqueNames.map(p => p.replace(/\\/g, '/').split('/'));
+    const minLen = Math.min(...partsList.map(parts => parts.length));
+
+    const commonParts: string[] = [];
+    for (let i = 0; i < minLen; i++) {
+        const segment = partsList[0][i];
+        if (partsList.every(parts => parts[i] === segment)) {
+            commonParts.push(segment);
+        } else {
+            break;
+        }
+    }
+
+    return commonParts.join('/');
 }
 
 //TODO: add exort root or extract root from comments
