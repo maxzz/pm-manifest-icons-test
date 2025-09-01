@@ -50,14 +50,22 @@ function generateExports(lines: string[], groups: Record<string, string[]>): voi
     lines.push('');
 }
 
+function getFromParts(from: string, commonPath: string): { folderRoot: string; folderComponent: string; } {
+    const short = from.replace(commonPath, '').replace(/^\//, '');
+    const parts = short.split('/');
+    const folderComponent = parts.pop() || '';
+    const folderRoot = parts.join('/');
+    return { folderRoot, folderComponent };
+}
+
 function generateSingleExport(lines: string[], uniqueNames: string[], nameToImport: Map<string, string>, groups: Record<string, string[]>): void {
     if (uniqueNames.length > 0) {
         const commonPath = findCommonPathInUniqueNames(Object.keys(groups));
 
         lines.push(`// Common path: ${commonPath}\n`);
         lines.push('export const collectedIconComponents = [');
-        // compute max name length so comments can be aligned
-        const maxNameLen = maxLength(uniqueNames) + 1; // 1 for the space after the name and comma
+
+        const maxNameLen = maxLength(uniqueNames) + 1; // // compute max name length so comments can be aligned; +1 for comma after the name
 
         const step1: Array<[string, string] | string> = [];
 
@@ -65,14 +73,13 @@ function generateSingleExport(lines: string[], uniqueNames: string[], nameToImpo
             const from = nameToImport.get(componentName);
             if (from) {
                 const padding = ' '.repeat(Math.max(1, maxNameLen - componentName.length)); // name, then padding so all comments line up vertically
+                
                 // lines.push(`    ${componentName},${padding}// from '${from}'`); // Annotate each entry with a comment showing where it was imported from (first occurrence)
 
-                const short = from.replace(commonPath, '').replace(/^\//, '');
-                const parts = short.split('/');
-                const folderComponent = parts.pop();
-                const folderRoot = parts.join('/');
+                const { folderRoot, folderComponent } = getFromParts(from, commonPath);
+
                 const firstTwo = `    { component: ${componentName},${padding}name: '${componentName}',${padding} folder: '${folderRoot}', `;
-                const last = `sub: '${folderComponent}' },`; //sub-folder
+                const last = `sub: '${folderComponent}' },`; // sub-folder
                 step1.push([firstTwo, last]);
             } else {
                 step1.push(`    ${componentName},`);
@@ -97,7 +104,7 @@ function generateSingleExport(lines: string[], uniqueNames: string[], nameToImpo
 }
 
 function generateDefTypes(lines: string[], groups: Record<string, string[]>): void {
-    // 2.2. export a single function DefAppTypes() that returns a fragment of JSX
+    // Export a single function DefAppTypes() that returns a fragment of JSX
     /*
     generate:
         export function DefAppTypes() {
@@ -111,8 +118,8 @@ function generateDefTypes(lines: string[], groups: Record<string, string[]>): vo
     lines.push(`export function DefAppTypes() {`);
     lines.push(`    return (<>`);
     for (const [importPath, componentNames] of Object.entries(groups)) {
-        const unique = Array.from(new Set(componentNames)).filter(n => n.startsWith('SvgSymbol')).sort();
-        unique.length && lines.push(`        {${unique.map(n => `${n}()}`).join('\n        ')}`);
+        const unique = Array.from(new Set(componentNames)).filter(n => n.startsWith('SvgSymbol')); //.sort();
+        unique.length && lines.push(`        ${unique.map(n => `{${n}()}`).join('\n        ')}`);
     }
     lines.push(`    </>);`);
     lines.push(`}`);
