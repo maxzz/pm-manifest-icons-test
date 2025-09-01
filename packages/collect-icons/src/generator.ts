@@ -73,6 +73,31 @@ function generateSingleExport(lines: string[], uniqueNames: string[], nameToImpo
     }
 }
 
+function generateDefTypes(lines: string[], groups: Record<string, string[]>): void {
+    // 2.2. export a single function DefAppTypes() that returns a fragment of JSX
+    /*
+    generate:
+        export function DefAppTypes() {
+            return (<>
+                {SvgSymbolAppWebChrome()}
+                {SvgSymbolAppWin()}
+                ...
+                {SvgSymbolIconManualMode()}
+                {SvgSymbolCatalog()}
+            </>);
+        }
+    */
+    lines.push(`export function DefAppTypes() {`);
+    lines.push(`    return (<>`);
+    for (const [importPath, componentNames] of Object.entries(groups)) {
+        const unique = Array.from(new Set(componentNames)).filter(n => n.startsWith('SvgSymbol')).sort();
+        unique.length && lines.push(`        {${unique.map(n => `${n}()}`).join('\n        ')}`);
+    }
+    lines.push(`    </>);`);
+    lines.push(`}`);
+    lines.push('');
+}
+
 /**
  * Generate the collected icons TypeScript file and write it to disk.
  *
@@ -96,32 +121,8 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
 
     generateSingleExport(lines, uniqueNames, nameToImport, groups);
 
-    /*
-    generate:
-export function DefAppTypes() {
-    return (<>
-        {SvgSymbolAppWebChrome()}
-        {SvgSymbolAppWin()}
-        {SvgSymbolAppWebIe()}
-        {SvgSymbolAppWebIeText()}
-        {SvgSymbolAppWebIeDot()}
-        {SvgSymbolIconManualMode()}
-        {SvgSymbolCatalog()}
-    </>);
-}
-
-     */
     // 2.2. export a single function DefAppTypes() that returns a fragment of JSX
-    lines.push(`export function DefAppTypes() {`);
-    lines.push(`    return (<>`);
-    for (const [importPath, componentNames] of Object.entries(groups)) {
-        const unique = Array.from(new Set(componentNames)).filter(n => n.startsWith('SvgSymbol')).sort();
-        unique.length && lines.push(`        {${unique.map(n => `${n}()}`).join('\n        ')}`);
-    }
-    lines.push(`    </>);`);
-    lines.push(`}`);
-    lines.push('');
-
+    generateDefTypes(lines, groups);
 
     // 2. names array and type
     // lines.push(`export const collectedIconNames = [\n    ${uniqueNames.map(n => `'${n}'`).join(',\n    ')},\n] as const;\n`);
