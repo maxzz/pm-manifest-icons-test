@@ -6,7 +6,7 @@ export function SectionMain() {
             {iconsByFolder.map(
                 ([groupName, items], idx) => (
                     <section key={groupName} className="grid place-items-center" style={{ gridColumnStart: `${idx + 2}` }}>
-                        <h3 className="text-sm font-medium mb-2">{groupName}</h3>
+                        <h3 className="my-2 text-sm font-medium text-sky-700">{groupName}</h3>
 
                         <div className="place-self-center grid gap-1">
                             {items.map(
