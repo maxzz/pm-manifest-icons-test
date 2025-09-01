@@ -6,10 +6,11 @@
  *
  * @returns Promise resolving to an object { dest, names } where `names` is the list of collected names.
  */
-export async function generateCollectedFile({ groups, uniqueNames }: { groups: Record<string, string[]>; uniqueNames: string[]; }): Promise<string> {
+export async function generateCollectedFile({ groups, allNames }: { groups: Record<string, string[]>; allNames: string[]; }): Promise<string> {
     const lines: string[] = [];
-    
-    const commonPath = findCommonPathInUniqueNames(Object.keys(groups));
+
+    const uniqueNames = Array.from(new Set(allNames))//.sort(); // Deduplicate names; don't sort by component name and keep order by import path
+    const commonPath = findCommonPath(Object.keys(groups));
     
     generateFileHeader(lines);
 
@@ -19,9 +20,9 @@ export async function generateCollectedFile({ groups, uniqueNames }: { groups: R
     // 1.2. exports
     generateExports(lines, groups);
 
-    // 2. export a single object containing all collected components
     const nameToImport = nameToImportMap(groups);
 
+    // 2.1. export a single object containing all collected components
     generateSingleExport(lines, commonPath, uniqueNames, nameToImport, groups);
 
     // 2.2. export a single function DefAppTypes() that returns a fragment of JSX
@@ -51,14 +52,6 @@ function generateExports(lines: string[], groups: Record<string, string[]>): voi
         unique.length && lines.push(`export * from '${importPath}';`);
     }
     lines.push('');
-}
-
-function fromFromGetFoldersRootAndSub(from: string, commonPath: string): { folderRoot: string; folderComponent: string; } {
-    const short = from.replace(commonPath, '').replace(/^\//, '');
-    const parts = short.split('/');
-    const folderComponent = parts.pop() || '';
-    const folderRoot = parts.join('/');
-    return { folderRoot, folderComponent };
 }
 
 function generateSingleExport(lines: string[], commonPath: string, uniqueNames: string[], nameToImport: Map<string, string>, groups: Record<string, string[]>): void {
@@ -120,6 +113,7 @@ function generateDefTypes(lines: string[], commonPath: string, groups: Record<st
 
     for (const [importPath, componentNames] of Object.entries(groups)) {
         const { folderRoot, folderComponent } = fromFromGetFoldersRootAndSub(importPath, commonPath);
+
         const unique = Array.from(new Set(componentNames)).filter(n => n.startsWith('SvgSymbol')); //.sort();
         unique.length && lines.push(`        ${unique.map(n => `{/*${folderRoot}*/ ${n}()}`).join('\n        ')}`);
     }
@@ -153,13 +147,13 @@ function maxLength(strings: string[]): number {
     return strings.reduce((m, s) => Math.max(m, s.length), 0);
 }
 
-function findCommonPathInUniqueNames(uniqueNames: string[]): string {
-    if (!uniqueNames || uniqueNames.length === 0) {
+function findCommonPath(filenames: string[]): string {
+    if (!filenames?.length) {
         return '';
     }
 
-    // normalize separators and split into parts
-    const partsList = uniqueNames.map(p => p.replace(/\\/g, '/').split('/'));
+    const partsList = filenames.map(filename => filename.replace(/\\/g, '/').split('/')); // normalize separators and split into parts
+
     const minLen = Math.min(...partsList.map(parts => parts.length));
 
     const commonParts: string[] = [];
@@ -175,6 +169,11 @@ function findCommonPathInUniqueNames(uniqueNames: string[]): string {
     return commonParts.join('/');
 }
 
-//TODO: add exort root or extract root from comments
-//TODO: instead of comment add this as second member of each component name
-//TODO: app: show folder name if there are multiple
+function fromFromGetFoldersRootAndSub(from: string, commonPath: string): { folderRoot: string; folderComponent: string; } {
+    // This is for: { folder: 'app', sub: '7-app-manual-mode' }
+    const short = from.replace(commonPath, '').replace(/^\//, '');
+    const parts = short.split('/');
+    const folderComponent = parts.pop() || '';
+    const folderRoot = parts.join('/');
+    return { folderRoot, folderComponent };
+}

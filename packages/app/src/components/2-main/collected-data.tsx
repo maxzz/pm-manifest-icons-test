@@ -57,6 +57,8 @@ export * from '../ui/icons/symbols/app/5-app-web-ie-text';
 export * from '../ui/icons/symbols/app/6-app-web-ie-dot';
 export * from '../ui/icons/symbols/app/7-app-manual-mode';
 
+// Common path: ../ui/icons/symbols
+
 export const collectedIconComponents = [
     { component: SvgSymbolFolder,            name: 'SvgSymbolFolder',             folder: 'all-other',  sub: '06-folder' },
     { component: SymbolFolder,               name: 'SymbolFolder',                folder: 'all-other',  sub: '06-folder' },
@@ -116,32 +118,32 @@ export const collectedIconComponents = [
 
 export function DefAppTypes() {
     return (<>
-        {SvgSymbolFolder()}
-        {SvgSymbolDot()}
-        {SvgSymbolOpenLink()}
-        {SvgSymbolCross()}
-        {SvgSymbolPen()}
-        {SvgSymbolFormLogin()}
-        {SvgSymbolFormChange()}
-        {SvgSymbolClassicCheck()}
-        {SvgSymbolClassicCheckEmpty()}
-        {SvgSymbolChevronDown()}
-        {SvgSymbolChevronUp()}
-        {SvgSymbolChevronDoubleDown()}
-        {SvgSymbolChevronRight()}
-        {SvgSymbolFire()}
-        {SvgSymbolInfo()}
-        {SvgSymbolQuestion()}
-        {SvgSymbolWarning()}
-        {SvgSymbolCode()}
-        {SvgSymbolForms()}
-        {SvgSymbolEllipsis()}
-        {SvgSymbolAppWebChrome()}
-        {SvgSymbolAppWin()}
-        {SvgSymbolCatalog()}
-        {SvgSymbolAppWebIe()}
-        {SvgSymbolAppWebIeText()}
-        {SvgSymbolAppWebIeDot()}
-        {SvgSymbolIconManualMode()}
+        {/*all-other*/ SvgSymbolFolder()}
+        {/*all-other*/ SvgSymbolDot()}
+        {/*all-other*/ SvgSymbolOpenLink()}
+        {/*all-other*/ SvgSymbolCross()}
+        {/*all-other*/ SvgSymbolPen()}
+        {/*all-other*/ SvgSymbolFormLogin()}
+        {/*all-other*/ SvgSymbolFormChange()}
+        {/*all-other*/ SvgSymbolClassicCheck()}
+        {/*all-other*/ SvgSymbolClassicCheckEmpty()}
+        {/*all-other*/ SvgSymbolChevronDown()}
+        {/*all-other*/ SvgSymbolChevronUp()}
+        {/*all-other*/ SvgSymbolChevronDoubleDown()}
+        {/*all-other*/ SvgSymbolChevronRight()}
+        {/*all-other*/ SvgSymbolFire()}
+        {/*all-other*/ SvgSymbolInfo()}
+        {/*all-other*/ SvgSymbolQuestion()}
+        {/*all-other*/ SvgSymbolWarning()}
+        {/*all-other*/ SvgSymbolCode()}
+        {/*all-other*/ SvgSymbolForms()}
+        {/*all-other*/ SvgSymbolEllipsis()}
+        {/*app*/ SvgSymbolAppWebChrome()}
+        {/*app*/ SvgSymbolAppWin()}
+        {/*app*/ SvgSymbolCatalog()}
+        {/*app*/ SvgSymbolAppWebIe()}
+        {/*app*/ SvgSymbolAppWebIeText()}
+        {/*app*/ SvgSymbolAppWebIeDot()}
+        {/*app*/ SvgSymbolIconManualMode()}
     </>);
 }

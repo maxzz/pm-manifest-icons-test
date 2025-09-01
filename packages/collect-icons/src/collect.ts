@@ -79,20 +79,17 @@ export async function collectIcons(opts: CollectIconsOptions = {}): Promise<{ na
         allNames.push(...names);
     }
 
-    // deduplicate names
-    const uniqueNames = Array.from(new Set(allNames))//.sort(); // don't sort by component name and keep order by import path
-
-    const cnt = await generateCollectedFile({ groups, uniqueNames });
+    const cnt = await generateCollectedFile({ groups, allNames });
     await fs.writeFile(dest, cnt, 'utf8');
 
     // Structured logging moved here so caller owns logging
-    logger.info('collected', { count: uniqueNames.length, dest });
+    logger.info('collected', { count: allNames.length, dest });
     if (opts.verbose) {
         logger.debug('files', { files: filenames });
-        logger.debug('names', { names: uniqueNames });
+        logger.debug('names', { names: allNames });
     }
     return {
-        names: uniqueNames,
+        names: allNames,
         dest,
     };
 }
