@@ -1,22 +1,22 @@
 {
-  "name": "collect-icons",
-  "version": "0.0.0",
-  "private": true,
-  "main": "dist/index.js",
-  "types": "src/index.d.ts",
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-  "build:test": "pnpm --filter tester run build",
-    "collect": "node ./bin/collect.js",
-  "collect:cli": "ts-node ./bin/collect.ts --srcDir ../app/src/components/ui/icons/symbols/all-other --outFile ../tester/collected-cli-recursive.ts --exportFolderName app --mode bare --verbose --recursive"
-  },
-  "dependencies": {
-    "fast-glob": "^3.2.12"
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "~5.8.3",
-    "vite": "^6.3.5"
-  }
+    "name": "collect-icons",
+    "version": "0.0.0",
+    "private": true,
+    "main": "dist/index.js",
+    "types": "src/index.d.ts",
+    "dependencies": {
+        "fast-glob": "^3.2.12"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "ts-node": "^10.9.2",
+        "typescript": "~5.8.3",
+        "vite": "^6.3.5"
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "build:test": "pnpm --filter tester run build",
+        "collect": "node ./bin/collect.js",
+        "collect:cli": "ts-node ./bin/collect.ts --srcDir ../app/src/components/ui/icons/symbols/all-other --outFile ../tester/collected-cli-recursive.ts --exportFolderName app --mode bare --verbose --recursive"
+    }
 }
